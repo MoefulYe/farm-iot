@@ -11,6 +11,6 @@ message KeepAliveMsg {
     google.protobuf.Timestamp timestamp = 1;
     string token = 2;
     GeoCoordinate geo = 3;
-    int32 weight = 4;
-    int32 health = 5;
+    double weight = 4;
+    double health = 5;
 }
