@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option go_package = "farm-iot/cow";
+
+import "google/protobuf/timestamp.proto";
+
+message GeoCoordinate {
+    double latitude = 1;
+    double longitude = 2;
+}
+
+message KeepAliveMsg {
+    google.protobuf.Timestamp timestamp = 1;
+    string token = 2;
+    GeoCoordinate geo = 3;
+    double weight = 4;
+    double health = 5;
+}

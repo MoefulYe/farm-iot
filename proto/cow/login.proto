@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option go_package = "farm-iot/cow";
+
+message LoginReq {
+    string uuid = 1;
+    string passwd = 2;
+}
+
+message LoginResp {
+    enum Status {
+        OK = 0;
+        INVALID_PASSWD = 1;
+        INVALID_UUID = 2;
+    }
+    Status status = 1;
+    string token = 2;
+}

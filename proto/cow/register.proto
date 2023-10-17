@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option go_package = "farm-iot/cow";
+
+import "google/protobuf/timestamp.proto";
+
+message RegisterReq {
+    google.protobuf.Timestamp born_at = 1;
+    string uuid = 2;
+    string passwd = 3;
+}
+
+message RegisterResp {
+    enum Status {
+        OK = 0;
+        ALREADY_REGISTERED = 1;
+        FAILED = 2;
+    }
+    Status status = 1;
+    string uuid = 2;
+    string token = 3;
+}
