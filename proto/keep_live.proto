@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+message GeoCoordinate {
+    double latitude = 1;
+    double longitude = 2;
+}
+
+message KeepAliveMsg {
+    google.protobuf.Timestamp timestamp = 1;
+    string uuid = 2;
+    GeoCoordinate geo = 3;
+    int32 weight = 4;
+    int32 health = 5;
+}
