@@ -5,4 +5,7 @@ gen-proto:
 	@protoc --proto_path=$(PROTO_DIR) --go_out=./protoc-gen  $(PROTO_FILES)
 
 run:
-	go build main.go
+	@go run main.go
+
+build:
+	@go build -o out/iot-server main.go
