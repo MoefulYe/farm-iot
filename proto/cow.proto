@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+message GeoCoordinate {
+    double latitude = 1;
+    double longitude = 2;
+}
+
+message KeepAliveMsg {
+    int32 id = 1;
+    GeoCoordinate geo = 2;
+    int32 weight = 3;
+    int32 health = 4;
+}
