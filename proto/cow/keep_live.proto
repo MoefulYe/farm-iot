@@ -9,7 +9,7 @@ message GeoCoordinate {
 
 message KeepAliveMsg {
     google.protobuf.Timestamp timestamp = 1;
-    string uuid = 2;
+    string token = 2;
     GeoCoordinate geo = 3;
     int32 weight = 4;
     int32 health = 5;
