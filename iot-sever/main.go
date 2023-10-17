@@ -21,9 +21,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
-
 	MQTT "github.com/eclipse/paho.mqtt.golang"
+	"os"
+	"time"
 )
 
 /*
@@ -44,19 +44,18 @@ Options:
 */
 
 func main() {
-	topic := flag.String("topic", "", "The topic name to/from which to publish/subscribe")
-	broker := flag.String("broker", "tcp://iot.eclipse.org:1883", "The broker URI. ex: tcp://10.10.1.1:1883")
-	password := flag.String("password", "", "The password (optional)")
-	user := flag.String("user", "", "The User (optional)")
+	topic := flag.String("topic", "111", "The topic name to/from which to publish/subscribe")
+	broker := flag.String("broker", "tcp://0.0.0.0:1883", "The broker URI. ex: tcp://10.10.1.1:1883")
+	password := flag.String("password", "admin", "The password (optional)")
+	user := flag.String("user", "admin", "The User (optional)")
 	id := flag.String("id", "testgoid", "The ClientID (optional)")
 	cleansess := flag.Bool("clean", false, "Set Clean Session (default false)")
 	qos := flag.Int("qos", 0, "The Quality of Service 0,1,2 (default 0)")
 	num := flag.Int("num", 1, "The number of messages to publish or subscribe (default 1)")
-	payload := flag.String("message", "", "The message text to publish (default empty)")
-	action := flag.String("action", "", "Action publish or subscribe (required)")
+	payload := flag.String("message", "sssssssasdasdasd", "The message text to publish (default empty)")
+	action := flag.String("action", "pub", "Action publish or subscribe (required)")
 	store := flag.String("store", ":memory:", "The Store Directory (default use memory store)")
 	flag.Parse()
-
 	if *action != "pub" && *action != "sub" {
 		fmt.Println("Invalid setting for -action, must be pub or sub")
 		return
@@ -101,6 +100,7 @@ func main() {
 			token := client.Publish(*topic, byte(*qos), false, *payload)
 			token.Wait()
 		}
+		time.Sleep(5 * time.Second)
 
 		client.Disconnect(250)
 		fmt.Println("Sample Publisher Disconnected")

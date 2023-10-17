@@ -1,4 +1,4 @@
-module iot-server
+module github.com/MoefulYe/farm-iot/iot-server
 
 go 1.21.2
 
