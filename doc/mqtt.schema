@@ -1,0 +1,35 @@
+mqtt主题设计
+
+服务器订阅的主题
+cow/keep-alive 设备向服务器发送心跳包
+cow/register 设备注册
+cow/login 设备登录
+cow/${uuid}/command-reply 设备回复命令执行结果
+
+设备订阅的主题
+cow/${uuid}/register-reply 服务器回复注册
+cow/${uuid}/login-reply 服务器回复登录
+cow/${uuid}/command 服务器下发命令
+
+设备注册流程
+1. 设备携带uuid和passwd向cow/register主题发起CONNECT方法
+2. 服务器收到注册请求后， 服务器在postgres上建立设备记录向cow/${uuid}/register-reply回复token
+3. 设备保存token作为凭证
+4. 订阅cow/${uuid}/#主题
+
+设备登录流程
+1. 设备携带uuid和passwd向cow/login主题发起CONNECT方法
+2. 服务器收到登录请求后， 服务器在postgres上验证设备记录，验证通过后向cow/${uuid}/login-reply回复token
+3. 设备保存token作为凭证
+4. 订阅cow/${uuid}/#主题
+
+设备心跳包
+每隔5分钟向cow/keep-alive主题发送一次心跳包包含设备当前状态
+
+设备命令下发
+1. 服务器向cow/${uuid}/command主题发送命令
+2. 服务器订阅cow/${uuid}/command-reply主题
+3. 设备收到命令后执行命令
+4. 设备向cow/${uuid}/command-reply回复命令执行结果
+5. 服务器退订cow/${uuid}/command-reply主题
+
