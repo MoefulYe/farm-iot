@@ -10,6 +10,7 @@ cow/${uuid}/command-reply 设备回复命令执行结果
 cow/${uuid}/register-reply 服务器回复注册
 cow/${uuid}/login-reply 服务器回复登录
 cow/${uuid}/command 服务器下发命令
+cow/${uuid}/reply
 
 设备注册流程
 1. 设备携带uuid和passwd向cow/register主题发起CONNECT方法
