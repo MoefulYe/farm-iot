@@ -1,6 +1,6 @@
 syntax = "proto3";
-
-option go_package = "farm-iot/cow";
+package farm.cow;
+option go_package = "farm/cow";
 
 import "google/protobuf/timestamp.proto";
 
