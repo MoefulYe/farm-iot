@@ -1,6 +1,12 @@
 package router
 
-import mqtt "github.com/eclipse/paho.mqtt.golang"
+import (
+	"github.com/MoefulYe/farm-iot/iot-server/handler"
+	. "github.com/MoefulYe/farm-iot/iot-server/server"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
+)
 
 func RegisterRouter(server mqtt.Client) {
+	Server.Subscribe("cow/register", 0, handler.RegisterHandler)
+	Server.Subscribe("cow/login", 0, handler.LoginHandler)
 }
