@@ -4,14 +4,14 @@ package ent
 
 import (
 	"context"
-	"dbschema/ent/predicate"
-	"dbschema/ent/user"
 	"fmt"
 	"math"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/MoefulYe/farm-iot/db/ent/predicate"
+	"github.com/MoefulYe/farm-iot/db/ent/user"
 )
 
 // UserQuery is the builder for querying User entities.

@@ -9,13 +9,12 @@ import (
 	"log"
 	"reflect"
 
-	"dbschema/ent/migrate"
-
-	"dbschema/ent/user"
+	"github.com/MoefulYe/farm-iot/db/ent/migrate"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"github.com/MoefulYe/farm-iot/db/ent/user"
 )
 
 // Client is the client that holds all ent builders.

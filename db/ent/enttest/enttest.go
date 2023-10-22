@@ -4,13 +4,13 @@ package enttest
 
 import (
 	"context"
-	"dbschema/ent"
-	// required by schema hooks.
-	_ "dbschema/ent/runtime"
 
-	"dbschema/ent/migrate"
+	"github.com/MoefulYe/farm-iot/db/ent"
+	// required by schema hooks.
+	_ "github.com/MoefulYe/farm-iot/db/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
+	"github.com/MoefulYe/farm-iot/db/ent/migrate"
 )
 
 type (

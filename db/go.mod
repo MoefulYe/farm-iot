@@ -1,4 +1,4 @@
-module dbschema
+module github.com/MoefulYe/farm-iot/db
 
 go 1.21.2
 

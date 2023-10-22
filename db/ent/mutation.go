@@ -4,13 +4,13 @@ package ent
 
 import (
 	"context"
-	"dbschema/ent/predicate"
 	"errors"
 	"fmt"
 	"sync"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/MoefulYe/farm-iot/db/ent/predicate"
 )
 
 const (

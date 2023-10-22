@@ -3,12 +3,12 @@
 package ent
 
 import (
-	"dbschema/ent/user"
 	"fmt"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/MoefulYe/farm-iot/db/ent/user"
 )
 
 // User is the model entity for the User schema.

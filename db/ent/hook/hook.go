@@ -4,8 +4,9 @@ package hook
 
 import (
 	"context"
-	"dbschema/ent"
 	"fmt"
+
+	"github.com/MoefulYe/farm-iot/db/ent"
 )
 
 // The UserFunc type is an adapter to allow the use of ordinary

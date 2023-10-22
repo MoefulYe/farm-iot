@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"dbschema/ent/user"
 	"errors"
 	"fmt"
 	"reflect"
@@ -13,6 +12,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/MoefulYe/farm-iot/db/ent/user"
 )
 
 // ent aliases to avoid import conflicts in user's code.
