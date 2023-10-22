@@ -7,9 +7,9 @@ import (
 	"github.com/MoefulYe/farm-iot/iot-server/protoc-gen/farm/cow"
 	"github.com/MoefulYe/farm-iot/iot-server/utils"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/golang/protobuf/proto"
 	"github.com/google/uuid"
 )
-import "github.com/golang/protobuf/proto"
 
 func RegisterHandler(server mqtt.Client, msg mqtt.Message) {
 	payload := new(cow.RegisterReq)
