@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "google-protobuf": "^3.21.2",
+    "mqtt": "^4.2.1",
+    "protobufjs": "^7.2.5"
+  }
+}
