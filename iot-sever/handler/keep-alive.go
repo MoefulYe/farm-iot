@@ -32,5 +32,5 @@ func KeepAliveMsgHandler(server mqtt.Client, msg mqtt.Message) {
 			Longitude: keepAlive.GetGeo().GetLongitude(),
 		},
 	}
-	stream.StreamInput() <- data
+	stream.Input() <- data
 }

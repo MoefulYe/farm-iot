@@ -3,10 +3,14 @@ package config
 import mqtt "github.com/eclipse/paho.mqtt.golang"
 
 type Config struct {
-	Broker    string
-	User      string
-	Passwd    string
-	PgConnStr string
+	Broker      string
+	User        string
+	Passwd      string
+	PgConnStr   string
+	InfluxdbOpt struct {
+		Url  string
+		Auth string
+	}
 }
 
 func (c *Config) NewServerOpts() *mqtt.ClientOptions {
