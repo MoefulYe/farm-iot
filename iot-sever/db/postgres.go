@@ -11,7 +11,7 @@ var (
 )
 
 func init() {
-	client, err := ent.Open("postgres", config.Conf.PgConnStr)
+	client, err := ent.Open("postgres", config.Conf.Postgres)
 	if err != nil {
 		log.Fatalf(err.Error())
 	}

@@ -1,16 +1,21 @@
 package config
 
-import mqtt "github.com/eclipse/paho.mqtt.golang"
+import (
+	"fmt"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/spf13/viper"
+	"log"
+)
 
 type Config struct {
-	Broker      string
-	User        string
-	Passwd      string
-	PgConnStr   string
-	InfluxdbOpt struct {
-		Url  string
-		Auth string
-	}
+	Broker   string `toml:"broker"`
+	User     string `toml:"user"`
+	Passwd   string `toml:"passwd"`
+	Postgres string `toml:"postgres"`
+	Influxdb struct {
+		Url  string `toml:"url"`
+		Auth string `toml:"auth"`
+	} `toml:"influxdb"`
 }
 
 func (c *Config) NewServerOpts() *mqtt.ClientOptions {
@@ -21,8 +26,16 @@ func (c *Config) NewServerOpts() *mqtt.ClientOptions {
 var Conf Config
 
 func init() {
-	Conf.Broker = "tcp://0.0.0.0:1883"
-	Conf.User = "admin"
-	Conf.Passwd = "admin"
-	Conf.PgConnStr = "host=127.0.0.1 port=5432 user=postgres dbname=farm-iot password=123456"
+	viper.AddConfigPath("./")
+	viper.SetConfigName("conf")
+	viper.SetConfigType("toml")
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	err = viper.Unmarshal(&Conf)
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	fmt.Println(Conf)
 }
