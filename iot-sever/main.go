@@ -9,7 +9,7 @@ import (
 func main() {
 	signal := make(chan os.Signal, 1)
 	done := make(chan struct{}, 1)
-	router.RegisterRouter(Server)
+	router.RegisterRouter()
 	go func() {
 		<-signal
 		Server.Disconnect(250)

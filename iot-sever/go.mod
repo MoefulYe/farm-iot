@@ -9,6 +9,7 @@ require (
 	github.com/golang/protobuf v1.5.3
 	github.com/google/uuid v1.3.1
 	github.com/influxdata/influxdb-client-go/v2 v2.12.3
+	github.com/lib/pq v1.10.9
 	github.com/reugn/go-streams v0.9.0
 	github.com/spf13/viper v1.17.0
 	golang.org/x/crypto v0.14.0

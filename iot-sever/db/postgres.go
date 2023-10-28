@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/MoefulYe/farm-iot/database/postgres/ent"
 	"github.com/MoefulYe/farm-iot/iot-server/config"
+	_ "github.com/lib/pq"
 	"log"
 )
 
