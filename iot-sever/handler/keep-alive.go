@@ -7,6 +7,7 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/golang/protobuf/proto"
 	"github.com/google/uuid"
+	"time"
 )
 
 func KeepAliveMsgHandler(server mqtt.Client, msg mqtt.Message) {
@@ -19,9 +20,13 @@ func KeepAliveMsgHandler(server mqtt.Client, msg mqtt.Message) {
 		return
 	}
 	id := uuid.MustParse(claims.Id)
+	timestamp, err := time.Parse(time.RFC3339, keepAlive.GetTimestamp())
+	if err != nil {
+		return
+	}
 	data := &stream.KeepAlive{
 		Uuid:      id,
-		Timestamp: keepAlive.GetTimestamp().AsTime(),
+		Timestamp: timestamp,
 		Weight:    keepAlive.GetWeight(),
 		Health:    keepAlive.GetHealth(),
 		Geo: struct {
