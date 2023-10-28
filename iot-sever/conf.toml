@@ -1,0 +1,8 @@
+broker = "127.0.0.1:1883"
+user = "admin"
+passwd = "admin"
+postgres = "host=127.0.0.1 port=5432 user=admin password=admin dbname=postgres"
+
+[influxdb]
+url = "127.0.0.1:7890"
+auth = ""

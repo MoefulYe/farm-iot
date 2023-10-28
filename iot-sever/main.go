@@ -16,4 +16,6 @@ func main() {
 		done <- struct{}{}
 	}()
 	<-done
+	close(signal)
+	close(done)
 }
