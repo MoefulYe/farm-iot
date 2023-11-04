@@ -10,6 +10,7 @@
 #### location
 ### 关系数据库
 #### uuid
+#### passwd
 #### brithday
 #### deathday
 #### death reason
