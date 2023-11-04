@@ -27,7 +27,8 @@ type KeepAlive struct {
 
 func (k *KeepAlive) AsPoint() *write.Point {
 	return write.NewPoint(
-		"cow", map[string]string{"uuid": k.Uuid.String()}, map[string]interface{}{
+		"cow", map[string]string{"uuid": k.Uuid.String()},
+		map[string]interface{}{
 			"weight":    k.Weight,
 			"health":    k.Health,
 			"latitude":  k.Geo.Latitude,
@@ -38,14 +39,15 @@ func (k *KeepAlive) AsPoint() *write.Point {
 
 func init() {
 	go sendToInfluxdb()
-
-	ext.NewChanSource(source).Via(
-		flow.NewMap(
-			func(k *KeepAlive) *write.Point {
-				return k.AsPoint()
-			}, 64,
-		),
-	).To(ext.NewChanSink(sink))
+	go func() {
+		ext.NewChanSource(source).Via(
+			flow.NewMap(
+				func(k *KeepAlive) *write.Point {
+					return k.AsPoint()
+				}, 64,
+			),
+		).To(ext.NewChanSink(sink))
+	}()
 }
 
 func Input() chan<- any {

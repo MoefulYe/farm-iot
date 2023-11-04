@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/spf13/viper"
 	"log"
@@ -13,8 +12,10 @@ type Config struct {
 	Passwd   string `toml:"passwd"`
 	Postgres string `toml:"postgres"`
 	Influxdb struct {
-		Url  string `toml:"url"`
-		Auth string `toml:"auth"`
+		Url      string `toml:"url"`
+		Auth     string `toml:"auth"`
+		Username string `toml:"username"`
+		Passwd   string `toml:"passwd"`
 	} `toml:"influxdb"`
 }
 
@@ -37,5 +38,4 @@ func init() {
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
-	fmt.Println(Conf)
 }

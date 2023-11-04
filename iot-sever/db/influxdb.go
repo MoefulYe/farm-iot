@@ -12,5 +12,5 @@ var InfluxWriteApi api.WriteAPI
 func init() {
 	opts := config.Conf.Influxdb
 	InfluxClient = influxdb2.NewClient(opts.Url, opts.Auth)
-	InfluxWriteApi = InfluxClient.WriteAPI("", "farm-iot")
+	InfluxWriteApi = InfluxClient.WriteAPI("farm-iot", "farm-iot")
 }

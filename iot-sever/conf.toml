@@ -1,8 +1,8 @@
-broker = "127.0.0.1:1883"
+broker = "124.221.89.92:1883"
 user = "admin"
 passwd = "admin"
-postgres = "host=127.0.0.1 port=5432 user=farmer password=mysecretpassword dbname=farm-iot sslmode=disable"
+postgres = "host=124.221.89.92 port=5432 user=farmer password=mysecretpassword dbname=farm-iot sslmode=disable"
 
 [influxdb]
-url = "http://127.0.0.1:8086"
-auth = "exAmple-t0ken-958a-f490-c7fd0eda5e9e"
+url = "http://124.221.89.92:8086"
+auth = "EFr0bgEQip96t-RL99r6rURvBzj0MFi4LtC-vCpIKaQYu4CjKm5M59xXakfL2NtLMArwPlXUykhrinwJVD53Zg=="

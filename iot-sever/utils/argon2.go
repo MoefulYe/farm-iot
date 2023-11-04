@@ -21,8 +21,9 @@ func Argon2Generate(passwd string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	hash := argon2.Key([]byte(passwd), salt, iterations, memory, parallelism, keyLength)
-
+	hash := argon2.IDKey(
+		[]byte(passwd), salt, iterations, memory, parallelism, keyLength,
+	)
 	base64Salt := base64.RawStdEncoding.EncodeToString(salt)
 	base64Hash := base64.RawStdEncoding.EncodeToString(hash)
 	return fmt.Sprintf("%s$%s", base64Salt, base64Hash), nil
@@ -33,7 +34,9 @@ func Argon2Verify(passwd string, passwdHash string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	toCompare := argon2.IDKey([]byte(passwd), salt, iterations, memory, parallelism, keyLength)
+	toCompare := argon2.IDKey(
+		[]byte(passwd), salt, iterations, memory, parallelism, keyLength,
+	)
 	if subtle.ConstantTimeCompare(toCompare, hash) == 1 {
 		return true, nil
 	}
@@ -55,11 +58,11 @@ func destructHashedPasswd(hashedPasswd string) ([]byte, []byte, error) {
 	if len(pair) != 2 {
 		return nil, nil, errors.New("hashedPasswd error")
 	}
-	hash, err := base64.RawStdEncoding.DecodeString(pair[0])
+	hash, err := base64.RawStdEncoding.DecodeString(pair[1])
 	if err != nil {
 		return nil, nil, err
 	}
-	salt, err := base64.RawStdEncoding.DecodeString(pair[1])
+	salt, err := base64.RawStdEncoding.DecodeString(pair[0])
 	if err != nil {
 		return nil, nil, err
 	}
