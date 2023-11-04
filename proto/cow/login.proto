@@ -1,8 +1,7 @@
 syntax = "proto3";
 
-package  farm.cow;
-
-option go_package = "farm-iot/cow";
+package farm.cow;
+option go_package = "farm/cow";
 
 message LoginReq {
     string uuid = 1;
