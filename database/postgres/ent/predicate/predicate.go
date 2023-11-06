@@ -8,3 +8,6 @@ import (
 
 // Device is the predicate function for device builders.
 type Device func(*sql.Selector)
+
+// User is the predicate function for user builders.
+type User func(*sql.Selector)
