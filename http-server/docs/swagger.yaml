@@ -1,0 +1,227 @@
+basePath: /api/v1
+definitions:
+  models.Info:
+    properties:
+      born_at:
+        type: string
+      dead_at:
+        type: string
+      id:
+        type: string
+      reason:
+        type: string
+    type: object
+  models.RegisterList:
+    properties:
+      passwd:
+        type: string
+      username:
+        type: string
+    type: object
+  models.Resp-models_Info:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/models.Info'
+      msg:
+        type: string
+    type: object
+  models.ResponseList:
+    properties:
+      code:
+        type: integer
+      data: {}
+      msg:
+        type: string
+    type: object
+  models.Token:
+    properties:
+      token:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /cow:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: json
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: xiangying
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseList'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Info'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: get all  info
+      tags:
+      - getInfo
+  /cow/{uuid}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: json
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: xiangying
+          schema:
+            $ref: '#/definitions/models.Resp-models_Info'
+      security:
+      - ApiKeyAuth: []
+      summary: get uuid info
+      tags:
+      - getInfo
+  /cow/keep-alive:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: need page
+        in: query
+        name: page
+        type: integer
+      - description: need size
+        in: query
+        name: size
+        type: integer
+      - description: field name
+        in: query
+        name: field
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: xiangying
+          schema:
+            $ref: '#/definitions/models.Resp-models_Info'
+      security:
+      - ApiKeyAuth: []
+      summary: keepalive package
+      tags:
+      - get Keep-alive package
+  /cow/keep-alive/{uuid}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: field name
+        in: query
+        name: field
+        required: true
+        type: string
+      - description: start time
+        in: query
+        name: start
+        type: integer
+      - description: end time
+        in: query
+        name: end
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: xiangying
+          schema:
+            $ref: '#/definitions/models.Resp-models_Info'
+      security:
+      - ApiKeyAuth: []
+      summary: keepalive by uuid
+      tags:
+      - get Keep-alive package
+  /login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterList'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: xiangying
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseList'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Token'
+              type: object
+      tags:
+      - Login
+  /register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterList'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: xiangying
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseList'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Token'
+              type: object
+      tags:
+      - register
+swagger: "2.0"
