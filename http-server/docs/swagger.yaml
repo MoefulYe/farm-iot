@@ -1,6 +1,6 @@
 basePath: /api/v1
 definitions:
-  models.Info:
+  models.DeviceInfo:
     properties:
       born_at:
         type: string
@@ -11,27 +11,60 @@ definitions:
       reason:
         type: string
     type: object
-  models.RegisterList:
+  models.LoginReq:
     properties:
       passwd:
         type: string
       username:
         type: string
     type: object
-  models.Resp-models_Info:
+  models.Msg:
+    properties:
+      code:
+        type: integer
+      msg:
+        type: string
+    type: object
+  models.Paged-models_DeviceInfo:
+    properties:
+      cnt:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/models.DeviceInfo'
+        type: array
+    type: object
+  models.RegisterReq:
+    properties:
+      passwd:
+        type: string
+      username:
+        type: string
+    type: object
+  models.Resp-Paged[models_DeviceInfo]:
     properties:
       code:
         type: integer
       data:
-        $ref: '#/definitions/models.Info'
+        $ref: '#/definitions/models.Paged-models_DeviceInfo'
       msg:
         type: string
     type: object
-  models.ResponseList:
+  models.Resp-models_DeviceInfo:
     properties:
       code:
         type: integer
-      data: {}
+      data:
+        $ref: '#/definitions/models.DeviceInfo'
+      msg:
+        type: string
+    type: object
+  models.Resp-models_Token:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/models.Token'
       msg:
         type: string
     type: object
@@ -48,28 +81,34 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: json
+      - description: jwt
         in: header
         name: Authorization
         required: true
         type: string
+      - in: query
+        minimum: 1
+        name: page
+        type: integer
+      - in: query
+        maximum: 40
+        minimum: 0
+        name: size
+        type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: xiangying
+          description: success
           schema:
-            allOf:
-            - $ref: '#/definitions/models.ResponseList'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/models.Info'
-                  type: array
-              type: object
+            $ref: '#/definitions/models.Resp-Paged[models_DeviceInfo]'
+        "400":
+          description: failure
+          schema:
+            $ref: '#/definitions/models.Msg'
       security:
       - ApiKeyAuth: []
-      summary: get all  info
+      summary: get all info
       tags:
       - getInfo
   /cow/{uuid}:
@@ -77,12 +116,12 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: json
+      - description: jwt
         in: header
         name: Authorization
         required: true
         type: string
-      - description: ID
+      - description: uuid
         in: path
         name: uuid
         required: true
@@ -91,12 +130,16 @@ paths:
       - application/json
       responses:
         "200":
-          description: xiangying
+          description: success
           schema:
-            $ref: '#/definitions/models.Resp-models_Info'
+            $ref: '#/definitions/models.Resp-models_DeviceInfo'
+        "400":
+          description: failure
+          schema:
+            $ref: '#/definitions/models.Msg'
       security:
       - ApiKeyAuth: []
-      summary: get uuid info
+      summary: get uuid info by uuid
       tags:
       - getInfo
   /cow/keep-alive:
@@ -125,10 +168,10 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
+        "199":
           description: xiangying
           schema:
-            $ref: '#/definitions/models.Resp-models_Info'
+            $ref: '#/definitions/models.Resp-models_DeviceInfo'
       security:
       - ApiKeyAuth: []
       summary: keepalive package
@@ -168,7 +211,7 @@ paths:
         "200":
           description: xiangying
           schema:
-            $ref: '#/definitions/models.Resp-models_Info'
+            $ref: '#/definitions/models.Resp-models_DeviceInfo'
       security:
       - ApiKeyAuth: []
       summary: keepalive by uuid
@@ -179,24 +222,23 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: json
+      - description: 账号和密码
         in: body
         name: data
         required: true
         schema:
-          $ref: '#/definitions/models.RegisterList'
+          $ref: '#/definitions/models.LoginReq'
       produces:
       - application/json
       responses:
         "200":
-          description: xiangying
+          description: success
           schema:
-            allOf:
-            - $ref: '#/definitions/models.ResponseList'
-            - properties:
-                data:
-                  $ref: '#/definitions/models.Token'
-              type: object
+            $ref: '#/definitions/models.Resp-models_Token'
+        "400":
+          description: failure
+          schema:
+            $ref: '#/definitions/models.Msg'
       tags:
       - Login
   /register:
@@ -204,24 +246,23 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: json
+      - description: 用户名和密码
         in: body
-        name: data
+        name: body-params
         required: true
         schema:
-          $ref: '#/definitions/models.RegisterList'
+          $ref: '#/definitions/models.RegisterReq'
       produces:
       - application/json
       responses:
         "200":
-          description: xiangying
+          description: success
           schema:
-            allOf:
-            - $ref: '#/definitions/models.ResponseList'
-            - properties:
-                data:
-                  $ref: '#/definitions/models.Token'
-              type: object
+            $ref: '#/definitions/models.Resp-models_Token'
+        "400":
+          description: failure
+          schema:
+            $ref: '#/definitions/models.Msg'
       tags:
       - register
 swagger: "2.0"

@@ -21,36 +21,40 @@
                 "tags": [
                     "getInfo"
                 ],
-                "summary": "get all  info",
+                "summary": "get all info",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "json",
+                        "description": "jwt",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 40,
+                        "minimum": 0,
+                        "type": "integer",
+                        "name": "size",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "xiangying",
+                        "description": "success",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.ResponseList"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/models.Info"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.Resp-Paged[models_DeviceInfo]"
+                        }
+                    },
+                    "400": {
+                        "description": "failure",
+                        "schema": {
+                            "$ref": "#/definitions/models.Msg"
                         }
                     }
                 }
@@ -102,10 +106,10 @@
                     }
                 ],
                 "responses": {
-                    "200": {
+                    "199": {
                         "description": "xiangying",
                         "schema": {
-                            "$ref": "#/definitions/models.Resp-models_Info"
+                            "$ref": "#/definitions/models.Resp-models_DeviceInfo"
                         }
                     }
                 }
@@ -167,7 +171,7 @@
                     "200": {
                         "description": "xiangying",
                         "schema": {
-                            "$ref": "#/definitions/models.Resp-models_Info"
+                            "$ref": "#/definitions/models.Resp-models_DeviceInfo"
                         }
                     }
                 }
@@ -189,18 +193,18 @@
                 "tags": [
                     "getInfo"
                 ],
-                "summary": "get uuid info",
+                "summary": "get uuid info by uuid",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "json",
+                        "description": "jwt",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "ID",
+                        "description": "uuid",
                         "name": "uuid",
                         "in": "path",
                         "required": true
@@ -208,9 +212,15 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "xiangying",
+                        "description": "success",
                         "schema": {
-                            "$ref": "#/definitions/models.Resp-models_Info"
+                            "$ref": "#/definitions/models.Resp-models_DeviceInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "failure",
+                        "schema": {
+                            "$ref": "#/definitions/models.Msg"
                         }
                     }
                 }
@@ -229,32 +239,26 @@
                 ],
                 "parameters": [
                     {
-                        "description": "json",
+                        "description": "账号和密码",
                         "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.RegisterList"
+                            "$ref": "#/definitions/models.LoginReq"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "xiangying",
+                        "description": "success",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.ResponseList"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/models.Token"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.Resp-models_Token"
+                        }
+                    },
+                    "400": {
+                        "description": "failure",
+                        "schema": {
+                            "$ref": "#/definitions/models.Msg"
                         }
                     }
                 }
@@ -273,32 +277,26 @@
                 ],
                 "parameters": [
                     {
-                        "description": "json",
-                        "name": "data",
+                        "description": "用户名和密码",
+                        "name": "body-params",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.RegisterList"
+                            "$ref": "#/definitions/models.RegisterReq"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "xiangying",
+                        "description": "success",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.ResponseList"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/models.Token"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.Resp-models_Token"
+                        }
+                    },
+                    "400": {
+                        "description": "failure",
+                        "schema": {
+                            "$ref": "#/definitions/models.Msg"
                         }
                     }
                 }
@@ -306,7 +304,7 @@
         }
     },
     "definitions": {
-        "models.Info": {
+        "models.DeviceInfo": {
             "type": "object",
             "properties": {
                 "born_at": {
@@ -323,7 +321,7 @@
                 }
             }
         },
-        "models.RegisterList": {
+        "models.LoginReq": {
             "type": "object",
             "properties": {
                 "passwd": {
@@ -334,27 +332,79 @@
                 }
             }
         },
-        "models.Resp-models_Info": {
+        "models.Msg": {
             "type": "object",
             "properties": {
                 "code": {
                     "type": "integer"
-                },
-                "data": {
-                    "$ref": "#/definitions/models.Info"
                 },
                 "msg": {
                     "type": "string"
                 }
             }
         },
-        "models.ResponseList": {
+        "models.Paged-models_DeviceInfo": {
+            "type": "object",
+            "properties": {
+                "cnt": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.DeviceInfo"
+                    }
+                }
+            }
+        },
+        "models.RegisterReq": {
+            "type": "object",
+            "properties": {
+                "passwd": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Resp-Paged[models_DeviceInfo]": {
             "type": "object",
             "properties": {
                 "code": {
                     "type": "integer"
                 },
-                "data": {},
+                "data": {
+                    "$ref": "#/definitions/models.Paged-models_DeviceInfo"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Resp-models_DeviceInfo": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "$ref": "#/definitions/models.DeviceInfo"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Resp-models_Token": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "$ref": "#/definitions/models.Token"
+                },
                 "msg": {
                     "type": "string"
                 }
