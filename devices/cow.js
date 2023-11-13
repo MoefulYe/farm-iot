@@ -171,10 +171,10 @@ class Cow {
         let min_long = Math.min(...farm.location.map((P) => P[0]))
         let max_lang = Math.max(...farm.location.map((p) => p[1]))
         let min_lang = Math.min(...farm.location.map((P) => P[1]))
-        long = Math.max(max_long, long)
-        long = Math.min(min_long, long)
-        lang = Math.max(max_lang, lang)
-        lang = Math.min(min_lang, lang)
+        long = Math.min(max_long, long)
+        long = Math.max(min_long, long)
+        lang = Math.min(max_lang, lang)
+        lang = Math.max(min_lang, lang)
         return [long, lang]
     }
 
