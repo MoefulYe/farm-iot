@@ -4,137 +4,155 @@ import (
 	"fmt"
 	"github.com/MoefulYe/farm-iot/http-server/db"
 	"github.com/MoefulYe/farm-iot/http-server/models"
+	"github.com/MoefulYe/farm-iot/http-server/utils"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/net/context"
+	"net/http"
+	"reflect"
 	"strings"
+	"time"
 )
 
-// GetKeepaliveByUuid PingExample godoc
-// @Tags  get Keep-alive package
+// GetKeepaliveByUuid
+// @Tags keep-alive
 // @Summary keepalive by uuid
-// @Schemes
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param Authorization header string true "jwt"
+// @Param uuid path string true  "uuid"
+// @Param query-params query models.RangeQuery true "范围, 查询字段"
+// @Success 200 {object} models.Resp[[]models.DeviceInfo] "success"
+// @Failure 400 {object} models.Msg "failure"
+// @Router /cow/keep-alive/{uuid} [get]
+func GetKeepaliveByUuid(c *gin.Context) {
+	var query models.RangeQuery
+	if err := c.BindQuery(&query); err != nil {
+		c.JSON(http.StatusBadRequest, models.MsgOnly(1, err.Error()))
+		return
+	}
+	uuid := c.Param("uuid")
+	fields := strings.Split(query.Fields, ",")
+	ranges := ranges(query.Start, query.Stop)
+	filter := fieldFilter(fields)
+	flux := buildFlux4SelectedUuid(ranges, filter, uuid)
+	println(flux)
+	res, err := db.QueryAPI.Query(c, flux)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.MsgOnly(1, err.Error()))
+		return
+	}
+	var ret []models.KeepAlive
+	for res.Next() {
+		var data models.KeepAlive
+		value := reflect.ValueOf(&data).Elem()
+		data.Id = res.Record().ValueByKey("uuid").(string)
+		data.Time = res.Record().ValueByKey("_time").(time.Time)
+		for _, field := range fields {
+			col := res.Record().ValueByKey(field)
+			if val, ok := col.(float64); ok {
+				value.FieldByName(utils.FirstToUpper(field)).SetFloat(val)
+			}
+		}
+		ret = append(ret, data)
+	}
+	if res.Err() != nil {
+		c.JSON(http.StatusBadRequest, models.MsgOnly(1, res.Err().Error()))
+		return
+	}
+	c.JSON(http.StatusOK, models.NewResp(0, "ok", ret))
+}
+
+// GetKeepalive
+// @Tags keep-alive
+// @Summary keepalive
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
 // @Param Authorization header string true "token"
-// @Param uuid path string    true  "uuid"
-// @Param       field    query     string  true  "field name"
-// @Param       start    query     int  false  "start time"
-// @Param       end    query     int  false  "end time"
-// @Success 200 {object} models.Resp[models.DeviceInfo] "xiangying"
-// @Router /cow/keep-alive/{uuid} [get]
-func GetKeepaliveByUuid(c *gin.Context) {
-	//page := c.Request.URL.Query().Get("page")
-	//size := c.Request.URL.Query().Get("size")
-	field := c.Request.URL.Query().Get("field")
-	uuid1 := c.Param("uuid")
-	var data []models.KeepAlive
-	Query := `from(bucket:"farm-iot")
-				|> range(start: -1m)
-				|> filter(fn: (r) => r._measurement == "cow")
-				|> filter(fn: (r) => r._field == "` + field + "\")\n" +
-		`|> filter(fn: (r) => r["uuid"] =="` + uuid1 + "\")"
-	fmt.Printf("%v", Query)
-	result, err := db.QueryAPI.Query(context.Background(), Query)
-	if err == nil {
-		// Use Next() to iterate over query result lines
-		for result.Next() {
-			k := strings.Split(result.Record().String(), ",")
-			time := strings.Split(k[4], ":")
-			value := strings.Split(k[5], ":")
-			uuid := strings.Split(k[8], ":")
-			c := models.KeepAlive{uuid[1], value[1], time[1]}
-			//fmt.Printf("%v\n", c)
-			data = append(data, c)
-		}
-		if result.Err() != nil {
-			c.JSON(
-				200,
-				models.ResponseList{Code: 1, Msg: "db.query err", Data: ""},
-			)
-			fmt.Printf("Query error: %s\n", result.Err().Error())
-			return
-		}
-	} else {
-		fmt.Printf("%v", err)
-		c.JSON(200, models.ResponseList{Code: 1, Msg: "db.query err", Data: ""})
+// @Param query-params query models.RangeQuery true "范围, 查询字段"
+// @Success 200 {object} models.Resp[[]models.KeepAlive] "success"
+// @Failure 400 {object} models.Msg "failure"
+// @Router /cow/keep-alive [get]
+func GetKeepalive(c *gin.Context) {
+	var query models.RangeQuery
+	if err := c.BindQuery(&query); err != nil {
+		c.JSON(http.StatusBadRequest, models.MsgOnly(1, err.Error()))
 		return
 	}
-	c.JSON(
-		200,
-		models.ResponseList{Code: 0, Msg: "keepalivePackage ok", Data: data},
+	fields := strings.Split(query.Fields, ",")
+	ranges := ranges(query.Start, query.Stop)
+	filter := fieldFilter(fields)
+	flux := buildFlux(ranges, filter)
+	res, err := db.QueryAPI.Query(c, flux)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.MsgOnly(1, err.Error()))
+		return
+	}
+	var ret []models.KeepAlive
+	for res.Next() {
+		var data models.KeepAlive
+		value := reflect.ValueOf(&data).Elem()
+		data.Id = res.Record().ValueByKey("uuid").(string)
+		data.Time = res.Record().ValueByKey("_time").(time.Time)
+		for _, field := range fields {
+			col := res.Record().ValueByKey(field)
+			if val, ok := col.(float64); ok {
+				value.FieldByName(utils.FirstToUpper(field)).SetFloat(val)
+			}
+		}
+		ret = append(ret, data)
+	}
+	if res.Err() != nil {
+		c.JSON(http.StatusBadRequest, models.MsgOnly(1, res.Err().Error()))
+		return
+	}
+	c.JSON(http.StatusOK, models.NewResp(0, "ok", ret))
+}
+
+func fieldFilter(fields []string) string {
+	term := func(field string) string {
+		return fmt.Sprintf("r._field == \"%s\"", field)
+	}
+	arr := make([]string, 0, len(fields))
+	for _, field := range fields {
+		arr = append(arr, term(field))
+	}
+	return strings.Join(arr, " or ")
+}
+
+func ranges(start string, stop string) string {
+	if start == "" && stop == "" {
+		panic("unreachable")
+	} else if start == "" {
+		return fmt.Sprintf("stop: %s", stop)
+	} else if stop == "" {
+		return fmt.Sprintf("start: %s", start)
+	} else {
+		return fmt.Sprintf("start: %s, stop: %s", start, stop)
+	}
+}
+
+func buildFlux(ranges string, fieldFilter string) string {
+	return fmt.Sprintf(
+		`from(bucket:"farm-iot")
+|> range(%s)
+|> filter(fn: (r) => r._measurement == "cow") 
+|> filter(fn: (r) => %s) 
+|> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")`,
+		ranges,
+		fieldFilter,
 	)
 }
 
-var field1query = map[string]string{
-	"weight": `from(bucket:"farm-iot")
-	|> range(start: -2m)
-	|> filter(fn: (r) => r._measurement == "cow")
-	|> filter(fn: (r) => r._field == "weight")`,
-	"health": `from(bucket:"farm-iot")
-	|> range(start: -6m)
-	|> filter(fn: (r) => r._measurement == "cow")
-	|> filter(fn: (r) => r._field == "health")`,
-	"latitude": `from(bucket:"farm-iot")
-	|> range(start: -6m)
-	|> filter(fn: (r) => r._measurement == "cow")
-	|> filter(fn: (r) => r._field == "latitude")`,
-	"longitude": `from(bucket:"farm-iot")
-	|> range(start: -6m)
-	|> filter(fn: (r) => r._measurement == "cow")
-	|> filter(fn: (r) => r._field == "longitude")`,
-}
-
-// GetKeepalive PingExample godoc
-// @Tags  get Keep-alive package
-// @Summary keepalive package
-// @Schemes
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Param Authorization header string true "token"
-// @Success 200 {object} models.Resp[models.KeepAlive] "success"
-// @Router /cow/keep-alive [get]
-func GetKeepalive(c *gin.Context) {
-	//page := c.Request.URL.Query().Get("page")
-	//size := c.Request.URL.Query().Get("size")
-
-	func buildQuery(query models.RangeQuery) string {
-
-	}
-	field := c.Request.URL.Query().Get("field")
-	var data []models.KeepAlive
-	query, ok := field1query[field]
-	if !ok {
-		return
-	}
-	result, err := db.QueryAPI.Query(context.Background(), query)
-	if err == nil {
-		// Use Next() to iterate over query result lines
-		for result.Next() {
-			k := strings.Split(result.Record().String(), ",")
-			time := strings.Split(k[3], ":")
-			value := strings.Split(k[4], ":")
-			uuid := strings.Split(k[7], ":")
-			c := models.KeepAlive{uuid[0], value[1], time[1]}
-			//fmt.Printf("%v\n", c)
-			data = append(data, c)
-		}
-		if result.Err() != nil {
-			c.JSON(
-				199,
-				models.ResponseList{Code: 1, Msg: "db.query err", Data: ""},
-			)
-			fmt.Printf("Query error: %s\n", result.Err().Error())
-			return
-		}
-	} else {
-		c.JSON(199, models.ResponseList{Code: 1, Msg: "db.query err", Data: ""})
-		fmt.Printf("%v", err)
-		return
-	}
-	c.JSON(
-		199,
-		models.ResponseList{Code: 0, Msg: "keepalivePackage ok", Data: data},
+func buildFlux4SelectedUuid(ranges string, fieldFilter string, uuid string) string {
+	return fmt.Sprintf(
+		`from(bucket:"farm-iot")
+|> range(%s)
+|> filter(fn: (r) => r._measurement == "cow" and  r.uuid == "%s") 
+|> filter(fn: (r) => %s) 
+|> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")`,
+		ranges,
+		uuid,
+		fieldFilter,
 	)
 }

@@ -19,7 +19,7 @@ func main() {
 	s1 := r.Group("/cow")
 	s1.Use(middleware.Jwt())
 	{
-		s1.GET("", handler.GetDeviceInfo)
+		s1.GET("/", handler.GetDeviceInfo)
 		s1.GET("/:uuid", handler.GetDeviceInfoByUuid)
 		s1.GET("/keep-alive", handler.GetKeepalive)
 		s1.GET("/keep-alive/:uuid", handler.GetKeepaliveByUuid)

@@ -74,9 +74,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "get Keep-alive package"
+                    "keep-alive"
                 ],
-                "summary": "keepalive package",
+                "summary": "keepalive",
                 "parameters": [
                     {
                         "type": "string",
@@ -86,30 +86,32 @@
                         "required": true
                     },
                     {
-                        "type": "integer",
-                        "description": "need page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "need size",
-                        "name": "size",
+                        "type": "string",
+                        "name": "fields",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "field name",
-                        "name": "field",
-                        "in": "query",
-                        "required": true
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "stop",
+                        "in": "query"
                     }
                 ],
                 "responses": {
-                    "199": {
-                        "description": "xiangying",
+                    "200": {
+                        "description": "success",
                         "schema": {
-                            "$ref": "#/definitions/models.Resp-models_DeviceInfo"
+                            "$ref": "#/definitions/models.Resp-array_models_KeepAlive"
+                        }
+                    },
+                    "400": {
+                        "description": "failure",
+                        "schema": {
+                            "$ref": "#/definitions/models.Msg"
                         }
                     }
                 }
@@ -129,13 +131,13 @@
                     "application/json"
                 ],
                 "tags": [
-                    "get Keep-alive package"
+                    "keep-alive"
                 ],
                 "summary": "keepalive by uuid",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "token",
+                        "description": "jwt",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -149,29 +151,31 @@
                     },
                     {
                         "type": "string",
-                        "description": "field name",
-                        "name": "field",
-                        "in": "query",
-                        "required": true
+                        "name": "fields",
+                        "in": "query"
                     },
                     {
-                        "type": "integer",
-                        "description": "start time",
+                        "type": "string",
                         "name": "start",
                         "in": "query"
                     },
                     {
-                        "type": "integer",
-                        "description": "end time",
-                        "name": "end",
+                        "type": "string",
+                        "name": "stop",
                         "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "xiangying",
+                        "description": "success",
                         "schema": {
-                            "$ref": "#/definitions/models.Resp-models_DeviceInfo"
+                            "$ref": "#/definitions/models.Resp-array_models_DeviceInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "failure",
+                        "schema": {
+                            "$ref": "#/definitions/models.Msg"
                         }
                     }
                 }
@@ -235,7 +239,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Login"
+                    "login"
                 ],
                 "parameters": [
                     {
@@ -321,6 +325,29 @@
                 }
             }
         },
+        "models.KeepAlive": {
+            "type": "object",
+            "properties": {
+                "health": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "time": {
+                    "type": "string"
+                },
+                "weight": {
+                    "type": "number"
+                }
+            }
+        },
         "models.LoginReq": {
             "type": "object",
             "properties": {
@@ -376,6 +403,40 @@
                 },
                 "data": {
                     "$ref": "#/definitions/models.Paged-models_DeviceInfo"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Resp-array_models_DeviceInfo": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.DeviceInfo"
+                    }
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Resp-array_models_KeepAlive": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.KeepAlive"
+                    }
                 },
                 "msg": {
                     "type": "string"

@@ -11,7 +11,7 @@ import (
 )
 
 // Login 登录
-// @Tags Login
+// @Tags login
 // @Accept json
 // @Produce json
 // @Param data body models.LoginReq true "账号和密码"
