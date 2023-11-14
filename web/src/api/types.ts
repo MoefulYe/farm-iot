@@ -1,6 +1,6 @@
 export interface Paginated<D> {
   data: D[]
-  total: number
+  cnt: number
 }
 
 export interface Pagination {
