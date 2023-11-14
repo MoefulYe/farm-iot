@@ -1,0 +1,163 @@
+{
+  "common": {
+    "bodyColor": "#FBFBFCFF",
+    "borderRadiusSmall": "4px",
+    "baseColor": "#F8F9FBFF",
+    "primaryColor": "#434c5eFF",
+    "borderRadius": "8px",
+    "primaryColorHover": "#434C5EFF",
+    "primaryColorPressed": "#434C5EFF",
+    "primaryColorSuppl": "#434C5EFF",
+    "infoColor": "#81a1c1FF",
+    "infoColorHover": "#81a1c1FF",
+    "infoColorPressed": "#81a1c1FF",
+    "infoColorSuppl": "#81a1c1FF",
+    "successColor": "#8fbcbbFF",
+    "successColorHover": "#8fbcbbFF",
+    "successColorPressed": "#8fbcbbFF",
+    "successColorSuppl": "#8fbcbbFF",
+    "warningColor": "#ebcb8bFF",
+    "warningColorHover": "#ebcb8bFF",
+    "warningColorPressed": "#ebcb8bFF",
+    "warningColorSuppl": "#ebcb8bFF",
+    "errorColor": "#bf616aFF",
+    "errorColorHover": "#bf616aFF",
+    "errorColorPressed": "#bf616aFF",
+    "errorColorSuppl": "#bf616aFF",
+    "textColorBase": "#000000FF",
+    "textColor1": "rgba(76, 86, 106, 1)",
+    "textColor2": "rgba(67, 76, 94, 1)",
+    "textColor3": "rgba(116, 129, 141, 1)",
+    "textColorDisabled": "rgba(116, 129, 141, 0.75)",
+    "placeholderColorDisabled": "rgba(116, 129, 141, 0.5)",
+    "placeholderColor": "rgba(116, 129, 141, 0.6)",
+    "iconColor": "rgba(102, 112, 131, 1)",
+    "iconColorPressed": "rgba(102, 112, 131, 1)",
+    "iconColorHover": "rgba(102, 112, 131, 1)",
+    "iconColorDisabled": "rgba(115, 125, 142, 0.5)",
+    "dividerColor": "rgba(216, 222, 233, 0.25)",
+    "borderColor": "rgb(224, 224, 230)",
+    "closeIconColor": "rgba(102, 102, 102, 1)",
+    "closeIconColorHover": "rgba(102, 102, 102, 1)",
+    "closeIconColorPressed": "rgba(102, 102, 102, 1)",
+    "clearColor": "rgba(194, 194, 194, 1)",
+    "tableColor": "#fff",
+    "popoverColor": "#fff",
+    "cardColor": "#fff",
+    "modalColor": "#fff",
+    "tagColor": "#eceff4FF",
+    "avatarColor": "rgba(229, 233, 240, 1)",
+    "codeColor": "rgba(251, 251, 252, 1)",
+    "tableHeaderColor": "rgba(236, 239, 244, 0.5)"
+  },
+  "Rate": {
+    "itemColorActive": "#ebcb8bFF"
+  },
+  "LoadingBar": {
+    "colorLoading": "#8fbcbbFF"
+  },
+  "Menu": {
+    "itemColorHover": "rgba(129, 161, 193, 0.2)",
+    "itemTextColorActive": "#5e81acFF",
+    "itemColorActiveHover": "rgba(129, 161, 193, 0.25)",
+    "itemColorActive": "rgba(129, 161, 193, 0.1)",
+    "color": "#0000",
+    "dividerColor": "rgba(255, 255, 255, 0)",
+    "itemColorActiveCollapsed": "rgba(129, 161, 193, 0.1)",
+    "arrowColorActive": "#5e81acFF",
+    "itemTextColorActiveHover": "#5e81acFF",
+    "itemTextColorChildActive": "#5e81acFF",
+    "itemTextColorChildActiveHover": "#5e81acFF",
+    "itemTextColorHoverHorizontal": "#5e81acFF",
+    "itemTextColorActiveHorizontal": "#5e81acFF",
+    "itemTextColorActiveHoverHorizontal": "#5e81acFF",
+    "itemTextColorChildActiveHorizontal": "#5e81acFF",
+    "itemTextColorChildActiveHoverHorizontal": "#5e81acFF",
+    "itemIconColor": "rgba(76, 86, 106, 1)",
+    "itemIconColorHover": "rgba(94, 129, 172, 1)",
+    "itemIconColorActive": "#5e81acFF",
+    "itemIconColorActiveHover": "#5E81ACFF",
+    "itemIconColorChildActive": "#5e81acFF",
+    "itemIconColorChildActiveHover": "#5e81acFF",
+    "itemIconColorCollapsed": "rgba(76, 86, 106, 1)",
+    "itemIconColorHorizontal": "rgba(94, 129, 172, 1)",
+    "itemIconColorHoverHorizontal": "#5e81acFF",
+    "itemIconColorActiveHorizontal": "#5e81acFF",
+    "itemIconColorActiveHoverHorizontal": "#5e81acFF",
+    "itemIconColorChildActiveHorizontal": "#5e81acFF",
+    "itemIconColorChildActiveHoverHorizontal": "#5e81acFF",
+    "arrowColorHover": "rgba(94, 129, 172, 1)",
+    "arrowColorActiveHover": "#5e81acFF",
+    "arrowColorChildActive": "#5e81acFF",
+    "arrowColorChildActiveHover": "#5e81acFF",
+    "itemColorActiveInverted": "#5e81acFF",
+    "itemColorActiveHoverInverted": "#5e81acFF",
+    "itemColorActiveCollapsedInverted": "#5e81acFF",
+    "itemTextColorHover": "rgba(94, 129, 172, 1)",
+    "itemTextColorInverted": "#BBB",
+    "itemTextColorHoverInverted": "#FFF",
+    "itemTextColorHorizontalInverted": "#BBB",
+    "itemIconColorInverted": "#BBB",
+    "groupTextColorInverted": "#AAA",
+    "arrowColorInverted": "#BBB",
+    "itemIconColorHorizontalInverted": "#BBB",
+    "itemIconColorCollapsedInverted": "#BBB",
+    "borderRadius": "12px"
+  },
+  "Skeleton": {
+    "color": "#e5e9f0FF",
+    "colorEnd": "#d8dee9FF"
+  },
+  "Spin": {
+    "textColor": "#434c5eFF",
+    "color": "#8fbcbbFF"
+  },
+  "Tooltip": {
+    "color": "rgba(46, 52, 64, 1)"
+  },
+  "Layout": {
+    "headerColor": "#FFFFFFFF",
+    "headerBorderColor": "rgba(216, 222, 233, 0.25)",
+    "footerBorderColor": "rgba(216, 222, 233, 0.25)",
+    "footerColor": "rgba(248, 249, 251, 1)",
+    "siderColor": "#FEFEFEFF",
+    "siderBorderColor": "rgba(216, 222, 233, 0.25)"
+  },
+  "Scrollbar": {
+    "color": "rgba(46, 52, 64, 0.75)",
+    "colorHover": "rgba(46, 52, 64, 0.9)"
+  },
+  "Anchor": {
+    "railColorActive": "#8fbcbbFF",
+    "linkTextColorActive": "#434c5eFF",
+    "railColor": "rgba(143, 188, 187, 0.25)",
+    "linkColor": "rgba(143, 188, 187, 0.15)"
+  },
+  "DataTable": {
+    "thIconColorActive": "#8fbcbbFF"
+  },
+  "DatePicker": {
+    "itemColorActive": "#8fbcbbFF"
+  },
+  "Dropdown": {
+    "optionColorActiveInverted": "#434c5eFF",
+    "optionTextColorHover": "rgba(94, 129, 172, 1)",
+    "optionTextColorActive": "#5e81acFF",
+    "optionTextColorChildActive": "#5e81acFF",
+    "optionColorHover": "rgba(129, 161, 193, 0.2)"
+  },
+  "Pagination": {
+    "itemColorActiveHover": "#0000",
+    "itemColorActive": "#0000"
+  },
+  "Switch": {
+    "railColorActive": "#8fbcbbFF"
+  },
+  "TimePicker": {
+    "itemTextColorActive": "#8fbcbbFF"
+  },
+  "Slider": {
+    "fillColor": "#8fbcbbFF",
+    "fillColorHover": "#8fbcbbFF"
+  }
+}
