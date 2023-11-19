@@ -11,7 +11,7 @@ import {
   NDivider
 } from 'naive-ui/lib'
 import { defineComponent, ref, render } from 'vue'
-import * as theme from '../assets/theme.json'
+import theme from '../assets/nord.naiveui.json'
 
 const login = defineComponent({
   setup(props, { emit }) {

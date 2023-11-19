@@ -1,18 +1,29 @@
 <script setup lang="ts">
-import { use } from "echarts/core";
+import { use, ComposeOption } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import { PieChart } from "echarts/charts";
+import { PieChart, PieSeriesOption } from "echarts/charts";
 import {
     TitleComponent,
+    TitleComponentOption,
     TooltipComponent,
-    LegendComponent
+    TooltipComponentOption,
+    LegendComponent,
+    LegendComponentOption
 } from "echarts/components";
-import VChart, { THEME_KEY } from "vue-echarts";
-import { ref, provide } from "vue";
+import VChart from "vue-echarts";
+import { ref } from "vue";
+
+type ChartOption = ComposeOption<
+    PieSeriesOption
+    | TitleComponentOption
+    | TooltipComponentOption
+    | LegendComponentOption
+>;
 
 use([CanvasRenderer, PieChart, TitleComponent, TooltipComponent, LegendComponent])
 
-const option = ref({
+
+const option = ref<ChartOption>({
     title: {
         text: "Traffic Sources",
         left: "center"
@@ -53,5 +64,5 @@ const option = ref({
 </script>
 
 <template>
-    <v-chart class="chart" :option="option"/>
+    <v-chart class="chart" :option="option" />
 </template>

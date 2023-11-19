@@ -1,6 +1,6 @@
 import '@/assets/tailwind.css'
 
-import { createApp } from 'vue'
+import { createApp, provide } from 'vue'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import router from '@/router'
