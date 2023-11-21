@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid')
 const farm = require("../farm.json")
 const fs = require('fs')
 const COWS = './cow.json'
-const INTERVAL = 1000 * 5
+const INTERVAL = 1000 * 60 * 5
 
 
 let cows = []
