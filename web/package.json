@@ -12,6 +12,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@types/echarts": "^4.9.22",
     "axios": "^1.6.1",
     "dayjs": "^1.11.9",
     "echarts": "^5.4.3",

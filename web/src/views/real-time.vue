@@ -1,68 +1,44 @@
 <script setup lang="ts">
-import { use, ComposeOption } from "echarts/core";
-import { CanvasRenderer } from "echarts/renderers";
-import { PieChart, PieSeriesOption } from "echarts/charts";
-import {
-    TitleComponent,
-    TitleComponentOption,
-    TooltipComponent,
-    TooltipComponentOption,
-    LegendComponent,
-    LegendComponentOption
-} from "echarts/components";
-import VChart from "vue-echarts";
-import { ref } from "vue";
+import { onMounted, ref } from 'vue'
+import { ComposeOption, use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { ScatterSeriesOption, ScatterChart } from 'echarts/charts'
+import VChart from 'vue-echarts'
+import 'echarts/extension/bmap/bmap'
+import { CENTER } from '../contanst'
+import { Field, GetKeepAlive } from '../api/keep_alive'
 
-type ChartOption = ComposeOption<
-    PieSeriesOption
-    | TitleComponentOption
-    | TooltipComponentOption
-    | LegendComponentOption
->;
+const fetch = async () => {
+    return await GetKeepAlive({
+        start: "-5m",
+        fields: [Field.longtitude, Field.latitude]
+    }).then(data => data.map(
+        (item) => ({
+            name: item.id,
+            value: [item.longtitude!, item.latitude!]
+        })
+    ))
+}
 
-use([CanvasRenderer, PieChart, TitleComponent, TooltipComponent, LegendComponent])
-
-
-const option = ref<ChartOption>({
-    title: {
-        text: "Traffic Sources",
-        left: "center"
-    },
-    tooltip: {
-        trigger: "item",
-        formatter: "{a} <br/>{b} : {c} ({d}%)"
-    },
-    legend: {
-        orient: "vertical",
-        left: "left",
-        data: ["Direct", "Email", "Ad Networks", "Video Ads", "Search Engines"]
-    },
-    series: [
-        {
-            name: "Traffic Sources",
-            type: "pie",
-            radius: "55%",
-            center: ["50%", "60%"],
-            data: [
-                { value: 335, name: "Direct" },
-                { value: 310, name: "Email" },
-                { value: 234, name: "Ad Networks" },
-                { value: 135, name: "Video Ads" },
-                { value: 1548, name: "Search Engines" }
-            ],
-            emphasis: {
-                itemStyle: {
-                    shadowBlur: 10,
-                    shadowOffsetX: 0,
-                    shadowColor: "rgba(0, 0, 0, 0.5)"
-                }
-            }
-        }
-    ]
+onMounted(async () => {
+    await fetch()
 })
 
+use([CanvasRenderer, ScatterChart])
+type Opt = ComposeOption<ScatterSeriesOption>
+
+const option = ref<Opt>({
+    bmap: {
+        center: CENTER,
+        zoom: 100,
+        roam: false,
+        mapStyle: {
+            styleJson: []
+        }
+    },
+})
 </script>
 
 <template>
-    <v-chart class="chart" :option="option" />
+    <v-chart :option="option" />
 </template>
