@@ -4,6 +4,6 @@ export interface Paginated<D> {
 }
 
 export interface Pagination {
-    page: number
-    size: number
+  page: number
+  size: number
 }

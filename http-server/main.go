@@ -19,10 +19,10 @@ func main() {
 	s1 := r.Group("/api/cow/")
 	s1.Use(middleware.Jwt())
 	{
-		s1.GET("", handler.GetDeviceInfo)
-		s1.GET(":uuid", handler.GetDeviceInfoByUuid)
 		s1.GET("keep-alive", handler.GetKeepalive)
 		s1.GET("keep-alive/:uuid", handler.GetKeepaliveByUuid)
+		s1.GET(":uuid", handler.GetDeviceInfoByUuid)
+		s1.GET("", handler.GetDeviceInfo)
 	} //?start=&end=
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	if err := r.Run(":8080"); err != nil {

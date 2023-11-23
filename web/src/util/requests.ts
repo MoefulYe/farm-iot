@@ -1,4 +1,4 @@
-import axios, { AxiosError, type AxiosRequestConfig} from 'axios'
+import axios, { AxiosError, type AxiosRequestConfig } from 'axios'
 import { useTokenStore } from '@/stores/token'
 
 const service = axios.create({

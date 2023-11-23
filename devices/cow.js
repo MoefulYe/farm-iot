@@ -162,8 +162,8 @@ class Cow {
         this.state.latitude = geo[1]
     }
     newGeo() {
-        const delta_long = (Math.random() - 0.5) * 0.01
-        const delta_lang = (Math.random() - 0.5) * 0.01
+        const delta_long = (Math.random() - 0.5) * 0.0005
+        const delta_lang = (Math.random() - 0.5) * 0.0005
         let long = this.state.longitude + delta_long
         let lang = this.state.latitude + delta_lang
         let max_long = Math.max(...farm.location.map((p) => p[0]))

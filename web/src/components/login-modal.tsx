@@ -131,7 +131,7 @@ const register = defineComponent({
   }
 })
 
-const modal = defineComponent({
+const Modal = defineComponent({
   setup() {
     const show = ref(true)
     const status = ref<'login' | 'register'>('login')
@@ -158,5 +158,5 @@ const modal = defineComponent({
 })
 
 export default async () => {
-  render(<modal />, document.body)
+  render(<Modal />, document.body)
 }

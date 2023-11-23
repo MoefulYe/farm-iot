@@ -17,5 +17,5 @@ import { THEME_KEY } from 'vue-echarts'
 import { registerTheme } from 'echarts'
 import echartsNordTheme from './assets/nord.echarts.json'
 registerTheme('nord', echartsNordTheme)
-provide(THEME_KEY, 'light')
+provide(THEME_KEY, 'nord')
 </script>

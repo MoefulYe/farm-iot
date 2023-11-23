@@ -10,15 +10,11 @@ export interface CowInfo {
 }
 
 export const GetCowInfoByUuid = async (uuid: string): Promise<CowInfo> => {
-  const {
-    dead_at,
-    born_at,
-    ...other
-  } = await request<any,any>({
+  const { dead_at, born_at, ...other } = await request<any, any>({
     method: 'get',
     url: `/cow/${uuid}/`
   })
-  const dead_at_dayjs = dead_at ? dayjs(dead_at) : undefined 
+  const dead_at_dayjs = dead_at ? dayjs(dead_at) : undefined
   const born_at_dayjs = dayjs(born_at)
   return {
     ...other,
@@ -28,16 +24,13 @@ export const GetCowInfoByUuid = async (uuid: string): Promise<CowInfo> => {
 }
 
 export const GetCowInfo = async (query: Pagination): Promise<Paginated<CowInfo>> => {
-  const {
-    cnt,
-    data
-  } = await request<any,any>({
+  const { cnt, data } = await request<any, any>({
     method: 'get',
     url: `/cow/`,
     params: query
   })
   const d = (data as any[]).map((item) => {
-    const {dead_at, born_at, ...other} = item
+    const { dead_at, born_at, ...other } = item
     const dead_at_dayjs = dead_at ? dayjs(dead_at) : undefined
     const born_at_dayjs = dayjs(born_at)
     return {

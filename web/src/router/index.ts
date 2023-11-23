@@ -7,7 +7,7 @@ const routes: RouteRecordRaw[] = [
     name: 'home',
     path: '/',
     redirect: {
-      name: 'real-time',
+      name: 'real-time'
     }
   },
   {
@@ -19,6 +19,11 @@ const routes: RouteRecordRaw[] = [
     name: 'cow-info',
     path: '/cow-info',
     component: () => import('../views/cow-info.vue')
+  },
+  {
+    name: 'stat',
+    path: '/stat/:uuid',
+    component: () => import('../views/stat-view')
   }
 ]
 

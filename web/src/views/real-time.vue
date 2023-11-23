@@ -6,8 +6,9 @@ import { TooltipComponent, TooltipComponentOption } from 'echarts/components'
 import { ScatterSeriesOption, ScatterChart, CustomChart, CustomSeriesOption } from 'echarts/charts'
 import VChart from 'vue-echarts'
 import 'echarts/extension/bmap/bmap'
-import { CENTER, POLYGON } from '../contanst'
+import { CENTER, COW_SVG_PATH, POLYGON } from '../contansts'
 import { Field, GetKeepAlive } from '../api/keep_alive'
+import { ECElementEvent } from 'echarts/types/dist/shared'
 
 type Opt = ComposeOption<ScatterSeriesOption | CustomSeriesOption | TooltipComponentOption>
 use([CanvasRenderer, ScatterChart, CustomChart, TooltipComponent])
@@ -56,13 +57,21 @@ const opt = computed<Opt>(() => {
         type: 'scatter',
         coordinateSystem: 'bmap',
         data: data.value,
-        symbolSize: 18,
+        symbol: COW_SVG_PATH,
+        symbolSize: 36,
         label: {
-          formatter: '{a}',
-          position: 'right'
+          formatter: (params) => params.name.substring(0, 5) + '...',
+          position: 'right',
+          show: true
         },
         itemStyle: {
-          color: '#d08770'
+          color: '#3b4252'
+        },
+        tooltip: {
+          formatter: ({ name, value }) => {
+            const [x, y] = <number[]>value
+            return `名字: ${name}<br/> 位置: (${x.toFixed(4)}, ${y.toFixed(4)})`
+          }
         }
       },
       {
@@ -80,8 +89,12 @@ const opt = computed<Opt>(() => {
     ]
   }
 })
+
+const onChartClick = (params: ECElementEvent) => {
+  window.$router.push({ name: 'stat', params: { uuid: params.name } })
+}
 </script>
 
 <template>
-  <v-chart :option="opt" :loading="loading" :loading-options="loadingOpts" />
+  <v-chart :option="opt" :loading="loading" :loading-options="loadingOpts" @click="onChartClick" />
 </template>

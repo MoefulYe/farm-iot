@@ -1,7 +1,7 @@
 import { type MenuOption, NIcon, NMenu } from 'naive-ui/lib'
 import { defineComponent, ref } from 'vue'
 import { ClockCircleOutlined, UnorderedListOutlined } from '@vicons/antd'
-import { Task, ChartArea, Wallet, Settings, } from '@vicons/carbon'
+import { Task, ChartArea, Wallet, Settings } from '@vicons/carbon'
 import { ExitOutline, StatsChart } from '@vicons/ionicons5'
 import { MenuUnfoldOutlined, MenuFoldOutlined } from '@vicons/antd'
 import { Pig } from '@vicons/tabler'
@@ -18,9 +18,8 @@ enum Keys {
   toggle = 'toggle',
   realtime = 'realtime',
   settings = 'settings',
-  stat = 'stat',
   cows = 'cows',
-  quit = 'quit',
+  quit = 'quit'
 }
 
 export default defineComponent({
@@ -47,27 +46,22 @@ export default defineComponent({
       {
         label: renderRouterLink('/real-time', '实时'),
         key: Keys.realtime,
-        icon: renderIcon(<ClockCircleOutlined/>)
+        icon: renderIcon(<ClockCircleOutlined />)
       },
       {
         label: renderRouterLink('/cow-info', '牲畜'),
         key: Keys.cows,
-        icon: renderIcon(<Pig/>)
-      },
-      {
-        label: () => '统计',
-        key: Keys.stat,
-        icon: renderIcon(<StatsChart/>)
+        icon: renderIcon(<Pig />)
       },
       {
         label: () => '设置',
         key: Keys.settings,
-        icon: renderIcon(<Settings/>),
+        icon: renderIcon(<Settings />),
         children: [
           {
             label: () => '退出',
             key: Keys.quit,
-            icon: renderIcon(<ExitOutline/>)
+            icon: renderIcon(<ExitOutline />)
           }
         ]
       }
