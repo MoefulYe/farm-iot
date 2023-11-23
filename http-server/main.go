@@ -10,19 +10,19 @@ import (
 	"log"
 )
 
-// @BasePath /api/v1
+// @BasePath /api
 func main() {
 	r := gin.Default()
-	docs.SwaggerInfo.BasePath = "/"
-	r.POST("/login", handler.Login)
-	r.POST("/register", handler.Register)
-	s1 := r.Group("/cow")
+	docs.SwaggerInfo.BasePath = "/api"
+	r.POST("/api/login", handler.Login)
+	r.POST("/api/register", handler.Register)
+	s1 := r.Group("/api/cow/")
 	s1.Use(middleware.Jwt())
 	{
-		s1.GET("/", handler.GetDeviceInfo)
-		s1.GET("/:uuid", handler.GetDeviceInfoByUuid)
-		s1.GET("/keep-alive", handler.GetKeepalive)
-		s1.GET("/keep-alive/:uuid", handler.GetKeepaliveByUuid)
+		s1.GET("keep-alive", handler.GetKeepalive)
+		s1.GET("keep-alive/:uuid", handler.GetKeepaliveByUuid)
+		s1.GET(":uuid", handler.GetDeviceInfoByUuid)
+		s1.GET("", handler.GetDeviceInfo)
 	} //?start=&end=
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	if err := r.Run(":8080"); err != nil {

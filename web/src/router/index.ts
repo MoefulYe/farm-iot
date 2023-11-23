@@ -1,35 +1,29 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import loginModal from '@/components/login-modal'
+import { useTokenStore } from '@/stores/token'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 const routes: RouteRecordRaw[] = [
   {
     name: 'home',
     path: '/',
-    component: () => import('../views/task-view.vue')
+    redirect: {
+      name: 'real-time'
+    }
   },
   {
-    name: 'task',
-    path: '/task',
-    component: () => import('../views/task-view.vue')
+    name: 'real-time',
+    path: '/real-time',
+    component: () => import('../views/real-time.vue')
   },
   {
-    name: 'group',
-    path: '/group',
-    component: () => import('../views/task-group-view.vue')
+    name: 'cow-info',
+    path: '/cow-info',
+    component: () => import('../views/cow-info.vue')
   },
   {
-    name: 'group/task',
-    path: '/group/:id',
-    component: () => import('../views/task-group-view.vue')
-  },
-  {
-    name: 'balance',
-    path: '/balance',
-    component: () => import('../views/balance-view.vue')
-  },
-  {
-    name: 'balance-stat',
-    path: '/balance/stat',
-    component: () => import('../views/balance-stat-view.vue')
+    name: 'stat',
+    path: '/stat/:uuid',
+    component: () => import('../views/stat-view')
   }
 ]
 
@@ -38,7 +32,11 @@ const router = createRouter({
   routes
 })
 
-// router.beforeEach((to, from, next) => {})
+router.beforeEach(async () => {
+  if (!useTokenStore().isLogin()) {
+    loginModal()
+  }
+})
 
 // router.afterEach((to, from, failure) => {})
 
