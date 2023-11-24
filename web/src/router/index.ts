@@ -23,7 +23,7 @@ const routes: RouteRecordRaw[] = [
   {
     name: 'stat',
     path: '/stat/:uuid',
-    component: () => import('../views/stat-view')
+    component: () => import('../views/stat-view.vue')
   }
 ]
 

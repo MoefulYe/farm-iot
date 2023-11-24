@@ -69,7 +69,7 @@ const opt = computed<Opt>(() => {
         },
         tooltip: {
           formatter: ({ name, value }) => {
-            const [x, y] = <number[]>value
+            const [x, y] = value as [number, number]
             return `名字: ${name}<br/> 位置: (${x.toFixed(4)}, ${y.toFixed(4)})`
           }
         }

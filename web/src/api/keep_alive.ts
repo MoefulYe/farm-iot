@@ -18,6 +18,13 @@ export enum Field {
   latitude = 'latitude'
 }
 
+export const FieldName = {
+  [Field.health]: '健康',
+  [Field.weight]: '体重',
+  [Field.latitude]: '纬度',
+  [Field.longitude]: '经度'
+}
+
 export interface QueryParams {
   start?: string
   stop?: string

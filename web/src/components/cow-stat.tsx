@@ -1,4 +1,4 @@
-import { Field, GetKeepAliveByUuid, type KeepAlive } from '@/api/keep_alive'
+import { Field, FieldName, GetKeepAliveByUuid, type KeepAlive } from '../api/keep_alive'
 import dayjs from 'dayjs'
 import { NDatePicker, NPopover, NSelect, type SelectOption } from 'naive-ui/lib'
 import { computed, defineComponent, onMounted, ref, watch, type Ref } from 'vue'
@@ -15,12 +15,14 @@ import {
 import { CanvasRenderer } from 'echarts/renderers'
 import type { ComposeOption } from 'echarts/core'
 import type { LineSeriesOption } from 'echarts/charts'
-import type {
+import {
   TooltipComponentOption,
   TitleComponentOption,
   ToolboxComponentOption,
   GridComponentOption,
-  DataZoomComponentOption
+  DataZoomComponentOption,
+  LegendComponent,
+  LegendComponentOption
 } from 'echarts/components'
 import { UniversalTransition } from 'echarts/features'
 import VChart from 'vue-echarts'
@@ -32,6 +34,7 @@ type EChartsOption = ComposeOption<
   | GridComponentOption
   | DataZoomComponentOption
   | LineSeriesOption
+  | LegendComponentOption
 >
 
 interface Range<T extends number | string> {
@@ -137,7 +140,8 @@ export default defineComponent({
       DataZoomComponent,
       LineChart,
       CanvasRenderer,
-      UniversalTransition
+      UniversalTransition,
+      LegendComponent
     ])
     const uuid = useRoute().params.uuid as string
     const custom = ref<Range<number>>({
@@ -176,10 +180,9 @@ export default defineComponent({
       return {
         tooltip: {
           trigger: 'axis',
-          position: function (pt) {
-            return [pt[0], '10%']
-          }
+          position: (pt) => [pt[0], '10%']
         },
+        legend: {},
         xAxis: {
           type: 'time',
           boundaryGap: false
@@ -193,7 +196,7 @@ export default defineComponent({
         dataZoom: [{ type: 'inside', start: 0, end: 100 }, {}],
         series: fieldSelected.value.map((field) => {
           return {
-            name: field,
+            name: FieldName[field],
             type: 'line',
             symbol: 'none',
             smooth: true,
@@ -218,7 +221,12 @@ export default defineComponent({
             class="w-96 p-2 inline"
             multiple
             options={fieldOpts}
-            v-model={[fieldSelected.value, 'value']}
+            value={fieldSelected.value}
+            onUpdateValue={(val: Field[]) => {
+              if (val.length > 0) {
+                fieldSelected.value = val
+              }
+            }}
           />
         </div>
         <VChart option={chartOpts.value} class="h-96" loading={loading.value} />
