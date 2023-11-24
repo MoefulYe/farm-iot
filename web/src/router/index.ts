@@ -24,6 +24,11 @@ const routes: RouteRecordRaw[] = [
     name: 'stat',
     path: '/stat/:uuid',
     component: () => import('../views/stat-view.vue')
+  },
+  {
+    name: 'blank',
+    path: '/blank',
+    component: () => import('../views/blank-view.vue')
   }
 ]
 
@@ -34,6 +39,7 @@ const router = createRouter({
 
 router.beforeEach(async () => {
   if (!useTokenStore().isLogin()) {
+    router.push({ name: 'blank' })
     loginModal()
   }
 })

@@ -16,13 +16,13 @@ import { CanvasRenderer } from 'echarts/renderers'
 import type { ComposeOption } from 'echarts/core'
 import type { LineSeriesOption } from 'echarts/charts'
 import {
-  TooltipComponentOption,
-  TitleComponentOption,
-  ToolboxComponentOption,
-  GridComponentOption,
-  DataZoomComponentOption,
+  type TooltipComponentOption,
+  type TitleComponentOption,
+  type ToolboxComponentOption,
+  type GridComponentOption,
+  type DataZoomComponentOption,
   LegendComponent,
-  LegendComponentOption
+  type LegendComponentOption
 } from 'echarts/components'
 import { UniversalTransition } from 'echarts/features'
 import VChart from 'vue-echarts'
@@ -41,6 +41,7 @@ interface Range<T extends number | string> {
   start: T
   stop?: T
 }
+
 enum RangeOptions {
   Custom = 'custom',
   PastOneMinute = '-1m',
