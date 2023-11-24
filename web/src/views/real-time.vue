@@ -9,6 +9,7 @@ import 'echarts/extension/bmap/bmap'
 import { CENTER, COW_SVG_PATH, POLYGON } from '../contansts'
 import { Field, GetKeepAlive } from '../api/keep_alive'
 import { ECElementEvent } from 'echarts/types/dist/shared'
+import BmapTheme from '../assets/bmap.theme.json'
 
 type Opt = ComposeOption<ScatterSeriesOption | CustomSeriesOption | TooltipComponentOption>
 use([CanvasRenderer, ScatterChart, CustomChart, TooltipComponent])
@@ -46,7 +47,7 @@ const opt = computed<Opt>(() => {
       zoom: 16,
       roam: true,
       mapStyle: {
-        styleJson: []
+        styleJson: BmapTheme
       }
     },
     tooltip: {
@@ -69,7 +70,7 @@ const opt = computed<Opt>(() => {
         },
         tooltip: {
           formatter: ({ name, value }) => {
-            const [x, y] = <number[]>value
+            const [x, y] = value as [number, number]
             return `名字: ${name}<br/> 位置: (${x.toFixed(4)}, ${y.toFixed(4)})`
           }
         }
@@ -79,7 +80,7 @@ const opt = computed<Opt>(() => {
         coordinateSystem: 'bmap',
         renderItem: (_, api) => {
           let points = POLYGON.map((p) => api.coord(p))
-          return { type: 'polygon', shape: { points }, style: { fill: '#8fbcbb', opacity: 0.1 } }
+          return { type: 'polygon', shape: { points }, style: { fill: '#81a1c1', opacity: 0.1 } }
         },
         animation: false,
         silent: true,

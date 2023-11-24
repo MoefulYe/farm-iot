@@ -142,12 +142,18 @@ const Modal = defineComponent({
             {status.value === 'login' ? (
               <login
                 onRegister={() => (status.value = 'register')}
-                onClose={() => (show.value = false)}
+                onClose={() => {
+                  window.$router.go(-1)
+                  show.value = false
+                }}
               />
             ) : (
               <register
                 onLogin={() => (status.value = 'login')}
-                onClose={() => (show.value = false)}
+                onClose={() => {
+                  window.$router.go(-1)
+                  show.value = false
+                }}
               />
             )}
           </NCard>

@@ -48,7 +48,7 @@
     "tagColor": "#eceff4FF",
     "avatarColor": "rgba(229, 233, 240, 1)",
     "codeColor": "rgba(251, 251, 252, 1)",
-    "tableHeaderColor": "rgba(236, 239, 244, 0.5)"
+    "tableHeaderColor": "rgba(236, 239, 244, 0.2)"
   },
   "Rate": {
     "itemColorActive": "#ebcb8bFF"
