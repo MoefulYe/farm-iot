@@ -73,6 +73,7 @@ export default defineComponent({
           useTokenStore().clearToken()
           window.$message.success('exit success')
           loginModal()
+          break
         case Keys.toggle:
           isCollapsed.value = !isCollapsed.value
           emit('toggle', isCollapsed.value)
