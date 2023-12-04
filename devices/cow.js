@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid')
 const farm = require("../farm.json")
 const fs = require('fs')
 const COWS = './cow.json'
-const INTERVAL = 1000 * 5
+const INTERVAL = 1000 * 60 * 5
 
 
 let cows = []
@@ -148,14 +148,13 @@ class Cow {
             })
         })
         await this.client.unsubscribeAsync(`cow/${this.state.uuid}/login-reply`, { qos: 0 })
-        console.log(data)
         if (data.status != 0) {
             throw new Error('invalid passwd or uuid')
         }
         return data.token
     }
     async keepalive() {
-        console.log(`[${this.now()}] ${this.state.uuid}`)
+        console.log(`[${this.now()}] ${this.state.uuid} ${this.state.longitude} ${this.state.latitude} ${this.state.weight} ${this.state.health} ${this.state.hp}`)
         const root = await protobuf.load(`${protopath}/keep_live.proto`);
         const GeoCoordinate = root.lookupType('farm.cow.GeoCoordinate');
         const KeepAliveMsg = root.lookupType('farm.cow.KeepAliveMsg');
@@ -184,8 +183,8 @@ class Cow {
         this.state.latitude = geo[1]
     }
     newGeo() {
-        const delta_long = Math.random() * 0.05
-        const delta_lang = Math.random() * 0.05
+        const delta_long = (Math.random() - 0.5) * 0.0005
+        const delta_lang = (Math.random() - 0.5) * 0.0005
         let long = this.state.longitude + delta_long
         let lang = this.state.latitude + delta_lang
         let max_long = Math.max(...farm.location.map((p) => p[0]))
