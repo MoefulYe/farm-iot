@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package farm.cow;
+option go_package = "farm/die";
+
+message Record {
+    string timestamp = 1;
+    string reason = 2;
+    string uuid = 3;
+}
+
+message DieMsg {
+    repeated Record record = 1;
+}
+
+message KillReq {
+    string uuid = 1;
+}

@@ -4,6 +4,7 @@ mqtt主题设计
 cow/keep-alive 设备向服务器发送心跳包
 cow/register 设备注册
 cow/login 设备登录
+cow/die [{uuid, dead_at, reason}]
 cow/${uuid}/command-reply 设备回复命令执行结果
 
 设备订阅的主题
@@ -34,3 +35,17 @@ cow/${uuid}/reply
 4. 设备向cow/${uuid}/command-reply回复命令执行结果
 5. 服务器退订cow/${uuid}/command-reply主题
 
+tuzai
+1. send command to killer (killer/kill)
+2. killer kill cow (send cow/${uuid}/command/kill)
+2.1 if cow recv kill command then disconnect bus
+3. killer reply ack with killed cow info to cow/die
+
+bingsi
+1. if run return ILLDIED then send info to cow/die
+2. disconnect
+
+fanzhi
+1. new cow
+2. cows.push(new_cow)
+3. qidong interval

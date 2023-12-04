@@ -22,6 +22,12 @@ class Cow {
             password: 'admin',
             reconnectPeriod: 1000,
         })
+        this.handler = null
+        this.client.subscribeAsync(`cow/${this.state.uuid}/command/#`, { qos: 1 })
+        this.client.on('message', (t, payload, packet) => {
+            if (t == `cow/${this.state.uuid}/command/kill`)
+                this.die()
+        })
     }
 
     static async newCow() {
@@ -60,17 +66,32 @@ class Cow {
     async run() {
         this.stateTrans()
         if (this.state.hp <= 0) {
-            await this.die()
-            return 0
+            await this.illdied()
+            return 'ill'
         } else {
             await this.keepalive()
-            return 1
+            return 'ok'
         }
     }
 
     async die() {
-        // gei server fa xiaoxi
-        const idx = cows.findIndex((item) => item.state.uuid == this.state.uuid)
+        this.client.end()
+        clearInterval(this.handler)
+        let idx = cows.findIndex(cow => cow.state.uuid == this.state.uuid)
+        if (idx != -1) {
+            cows.splice(idx, 1)
+        }
+    }
+    async illdied() {
+        const root2 = await protobuf.load(`${protopath}/die.proto`);
+        const DieMsg = root2.lookupType('farm.cow.DieMsg');//todo
+        var payload = [{ timestamp: this.now(), uuid: this.state.uuid, reason: "illdied" }]
+        var message = DieMsg.create(payload);
+        const buf = DieMsg.encode(message).finish();
+        this.client.publishAsync(`cow/die`, buf, { qos: 2, retain: false })
+        this.client.end()
+        clearInterval(this.handler)
+        let idx = cows.findIndex(cow => cow.state.uuid == this.state.uuid)
         if (idx != -1) {
             cows.splice(idx, 1)
         }
@@ -184,14 +205,21 @@ const topEntry = async () => {
     await recover()
 
     for (const cow of cows) {
-        const handler = setInterval(async () => {
-            const res = await cow.run()
-            if (res == 0) {
-                clearInterval(handler)
+        cow.handler = setIntferval(async () => {
+            switch (await cow.run()) {
+                case 'ok':
+                    break
+                case 'ill':
+                    await cow.illdied()
+                    break
+                case 'reproduce':
+
+                    break
+                default:
+                    throw Error('unreachable')
             }
         }, INTERVAL)
     }
-
     process.on('SIGINT', save)
     process.on('SIGTERM', save)
 }
