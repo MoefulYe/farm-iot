@@ -3,7 +3,9 @@ package handler
 import (
 	"github.com/MoefulYe/farm-iot/database/postgres/ent/device"
 	"github.com/MoefulYe/farm-iot/http-server/db"
+	"github.com/MoefulYe/farm-iot/http-server/grpc_service"
 	"github.com/MoefulYe/farm-iot/http-server/models"
+	"github.com/MoefulYe/farm-iot/http-server/protoc-gen/grpc/kill"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
@@ -84,4 +86,29 @@ func GetDeviceInfo(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, models.NewResp(0, "ok", models.NewPaged(cnt, v)))
+}
+
+// KillDevice
+// @Tags kill
+// @Summary kill device
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param Authorization header string true "jwt"
+// @Param Req body models.KillReq true "uuid"
+// @Success 200 {object} models.Resp[models.KillResp] "success"
+// @Failure 400 {object} models.Msg "failure"
+// @Router /cow [get]
+func KillDevice(c *gin.Context) {
+	var req models.KillReq
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, models.MsgOnly(1, err.Error()))
+		return
+	}
+	_, err := grpc_service.Client.Kill(c, &kill.KillReq{Uuid: req.Uuid})
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.MsgOnly(1, err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, models.NewResp(0, "ok", models.KillResp{}))
 }

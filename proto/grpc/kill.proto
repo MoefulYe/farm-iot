@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package grpc.kill;
+option go_package = "grpc/kill";
+
+message KillReq {
+    string uuid = 1;
+}
+
+message KillResp {}
+
+service Kill {
+    rpc Kill(KillReq) returns (KillResp) {}
+}

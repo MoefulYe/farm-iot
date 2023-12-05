@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/MoefulYe/farm-iot/http-server/config"
 	"github.com/MoefulYe/farm-iot/http-server/docs"
 	"github.com/MoefulYe/farm-iot/http-server/handler"
 	"github.com/MoefulYe/farm-iot/http-server/middleware"
@@ -22,10 +23,11 @@ func main() {
 		s1.GET("keep-alive", handler.GetKeepalive)
 		s1.GET("keep-alive/:uuid", handler.GetKeepaliveByUuid)
 		s1.GET(":uuid", handler.GetDeviceInfoByUuid)
+		s1.GET(":uuid/kill", handler.KillDevice)
 		s1.GET("", handler.GetDeviceInfo)
 	} //?start=&end=
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	if err := r.Run(":8080"); err != nil {
+	if err := r.Run(config.Conf.Port); err != nil {
 		log.Fatalf(err.Error())
 	}
 }

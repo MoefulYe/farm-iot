@@ -10,3 +10,9 @@ type DeviceInfo struct {
 	DeadAt *time.Time `json:"dead_at,omitempty"`
 	Reason *string    `json:"reason,omitempty"`
 }
+
+type KillReq struct {
+	Uuid string
+}
+
+type KillResp struct{}

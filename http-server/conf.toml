@@ -1,0 +1,7 @@
+postgres = "host=124.221.89.92 port=5432 user=farmer password=mysecretpassword dbname=farm-iot sslmode=disable"
+port = ":8080"
+grpc_server = "127.0.0.1:7899"
+
+[influxdb]
+url = "http://124.221.89.92:8086"
+auth = "EFr0bgEQip96t-RL99r6rURvBzj0MFi4LtC-vCpIKaQYu4CjKm5M59xXakfL2NtLMArwPlXUykhrinwJVD53Zg=="

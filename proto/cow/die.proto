@@ -10,7 +10,7 @@ message Record {
 }
 
 message DieMsg {
-    repeated Record record = 1;
+    Record record = 1;
 }
 
 message KillReq {
