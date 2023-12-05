@@ -23,4 +23,7 @@ func RegisterRouter() {
 	); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
+	if token := Server.Subscribe("cow/die", 0, handler.DieMsgHandler); token.Wait() && token.Error() != nil {
+		panic(token.Error())
+	}
 }

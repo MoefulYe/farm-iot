@@ -2,6 +2,7 @@ broker = "124.221.89.92:1883"
 user = "admin"
 passwd = "admin"
 postgres = "host=124.221.89.92 port=5432 user=farmer password=mysecretpassword dbname=farm-iot sslmode=disable"
+grpc_addr = ":7899"
 
 [influxdb]
 url = "http://124.221.89.92:8086"

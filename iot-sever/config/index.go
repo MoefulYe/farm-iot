@@ -11,6 +11,7 @@ type Config struct {
 	User     string `toml:"user"`
 	Passwd   string `toml:"passwd"`
 	Postgres string `toml:"postgres"`
+	GrpcPort string `toml:"grpc_port"`
 	Influxdb struct {
 		Url      string `toml:"url"`
 		Auth     string `toml:"auth"`
