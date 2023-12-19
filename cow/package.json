@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "protoc": "for file in ../proto/cow/*; pbjs --ts ${file} ../proto/cow/${file}"
+    "protoc": "for file in ../proto/cow/*;do name=`basename ${file}`; pbjs --ts protoc/${name%%.*}.ts ${file};done"
   },
   "dependencies": {
     "@types/uuid": "^9.0.7",

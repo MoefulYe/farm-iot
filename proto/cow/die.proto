@@ -13,7 +13,3 @@ message KillResp {
     double latitude = 7;
     double longitude = 8;
 }
-
-message KillReq {
-    string uuid = 1;
-}

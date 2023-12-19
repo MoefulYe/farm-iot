@@ -9,12 +9,13 @@ message RegisterReq {
     string passwd = 3;
 }
 
+enum Status {
+    OK = 0;
+    ALREADY_REGISTERED = 1;
+    FAILED = 2;
+}
+
 message RegisterResp {
-    enum Status {
-        OK = 0;
-        ALREADY_REGISTERED = 1;
-        FAILED = 2;
-    }
     Status status = 1;
     string uuid = 2;
     string token = 3;
