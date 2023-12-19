@@ -3,14 +3,15 @@ syntax = "proto3";
 package farm.cow;
 option go_package = "farm/die";
 
-message Record {
+message KillResp {
     string timestamp = 1;
     string reason = 2;
     string uuid = 3;
-}
-
-message DieMsg {
-    repeated Record record = 1;
+    string token = 4;
+    double weight = 5;
+    double health = 6;
+    double latitude = 7;
+    double longitude = 8;
 }
 
 message KillReq {

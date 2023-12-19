@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="5d33469c-947a-43ff-aaa6-306266bc2fe7" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../devices/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../../cow/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../devices/cow.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../cow/cow.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../devices/cow.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../devices/killer.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../devices/makefile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../devices/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../cow/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../devices/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../cow/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../devices/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../../cow/pnpm-lock.yaml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 4
+}]]></component>
+  <component name="ProjectId" id="2ZlQTXVOnZWMrYt1VSHy4n1ay1H" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/ashenye&quot;
+  }
+}</component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VgoProject">
+    <settings-migrated>true</settings-migrated>
+  </component>
+</project>
