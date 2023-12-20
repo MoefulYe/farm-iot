@@ -3,7 +3,7 @@ syntax = "proto3";
 package farm.cow;
 option go_package = "farm/die";
 
-message KillResp {
+message Die {
     string timestamp = 1;
     string reason = 2;
     string uuid = 3;

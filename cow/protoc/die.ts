@@ -1,4 +1,4 @@
-export interface KillResp {
+export interface Die {
   timestamp?: string;
   reason?: string;
   uuid?: string;
@@ -9,13 +9,13 @@ export interface KillResp {
   longitude?: number;
 }
 
-export function encodeKillResp(message: KillResp): Uint8Array {
+export function encodeDie(message: Die): Uint8Array {
   let bb = popByteBuffer();
-  _encodeKillResp(message, bb);
+  _encodeDie(message, bb);
   return toUint8Array(bb);
 }
 
-function _encodeKillResp(message: KillResp, bb: ByteBuffer): void {
+function _encodeDie(message: Die, bb: ByteBuffer): void {
   // optional string timestamp = 1;
   let $timestamp = message.timestamp;
   if ($timestamp !== undefined) {
@@ -73,12 +73,12 @@ function _encodeKillResp(message: KillResp, bb: ByteBuffer): void {
   }
 }
 
-export function decodeKillResp(binary: Uint8Array): KillResp {
-  return _decodeKillResp(wrapByteBuffer(binary));
+export function decodeDie(binary: Uint8Array): Die {
+  return _decodeDie(wrapByteBuffer(binary));
 }
 
-function _decodeKillResp(bb: ByteBuffer): KillResp {
-  let message: KillResp = {} as any;
+function _decodeDie(bb: ByteBuffer): Die {
+  let message: Die = {} as any;
 
   end_of_message: while (!isAtEnd(bb)) {
     let tag = readVarint32(bb);

@@ -14,14 +14,16 @@ export const LATITUDE_MAX = Math.max(...LOCATION.map((point) => point[1]));
 export const LONGITUDE_CENTER = (LONGITUDE_MAX + LONGITUDE_MIN) / 2;
 export const LATITUDE_CENTER = (LATITUDE_MAX + LATITUDE_MIN) / 2;
 
-export const LONGITUDE_BOUND = [LONGITUDE_MIN, LONGITUDE_MAX];
-export const LATITUDE_BOUND = [LATITUDE_MIN, LATITUDE_MAX];
-export const CENTER = [LONGITUDE_CENTER, LATITUDE_CENTER];
+export const LONGITUDE_BOUND: [number, number] = [LONGITUDE_MIN, LONGITUDE_MAX];
+export const LATITUDE_BOUND: [number, number] = [LATITUDE_MIN, LATITUDE_MAX];
+export const CENTER: [number, number] = [LONGITUDE_CENTER, LATITUDE_CENTER];
+
+export const fix = (val: number, [minBound, maxBound]: [number, number]) =>
+  Math.max(minBound, Math.min(maxBound, val));
 
 export const fixLongitude = (longitude: number) =>
-  Math.max(LONGITUDE_MIN, Math.min(LONGITUDE_MAX, longitude));
-export const fixLatitude = (latitude: number) =>
-  Math.max(LATITUDE_MIN, Math.min(LATITUDE_MAX, latitude));
+  fix(longitude, LONGITUDE_BOUND);
+export const fixLatitude = (latitude: number) => fix(latitude, LATITUDE_BOUND);
 
 export const EQMX_HOST = process.env.EQMX_HOST!;
 export const EQMX_PORT = process.env.EQMX_PORT!;

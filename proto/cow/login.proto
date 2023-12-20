@@ -8,12 +8,13 @@ message LoginReq {
     string passwd = 2;
 }
 
+enum Status {
+    OK = 0;
+    INVALID_PASSWD = 1;
+    INVALID_UUID = 2;
+}
+
 message LoginResp {
-    enum Status {
-        OK = 0;
-        INVALID_PASSWD = 1;
-        INVALID_UUID = 2;
-    }
     Status status = 1;
     string token = 2;
 }

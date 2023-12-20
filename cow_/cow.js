@@ -115,7 +115,7 @@ class Cow {
     const topic = `cow/${this.state.uuid}/register-reply`;
     const root = await protobuf.load(`${protopath}/register.proto`);
     const RegisterReq = root.lookupType("farm.cow.RegisterReq");
-    const RegisterResp = root.lookupType("farm.cow.RegisterResp");
+    const RegisterResp = root.lookupType("farm.cow.Registerconst tokenResp");
     const payload = {
       bornAt: this.state.born_at,
       uuid: this.state.uuid,

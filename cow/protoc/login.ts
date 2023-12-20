@@ -1,3 +1,21 @@
+export const enum Status {
+  OK = "OK",
+  INVALID_PASSWD = "INVALID_PASSWD",
+  INVALID_UUID = "INVALID_UUID",
+}
+
+export const encodeStatus: { [key: string]: number } = {
+  OK: 0,
+  INVALID_PASSWD: 1,
+  INVALID_UUID: 2,
+};
+
+export const decodeStatus: { [key: number]: Status } = {
+  0: Status.OK,
+  1: Status.INVALID_PASSWD,
+  2: Status.INVALID_UUID,
+};
+
 export interface LoginReq {
   uuid?: string;
   passwd?: string;
@@ -74,12 +92,8 @@ function _encodeLoginResp(message: LoginResp, bb: ByteBuffer): void {
   // optional Status status = 1;
   let $status = message.status;
   if ($status !== undefined) {
-    writeVarint32(bb, 10);
-    let nested = popByteBuffer();
-    _encodeStatus($status, nested);
-    writeVarint32(bb, nested.limit);
-    writeByteBuffer(bb, nested);
-    pushByteBuffer(nested);
+    writeVarint32(bb, 8);
+    writeVarint32(bb, encodeStatus[$status]);
   }
 
   // optional string token = 2;
@@ -106,9 +120,7 @@ function _decodeLoginResp(bb: ByteBuffer): LoginResp {
 
       // optional Status status = 1;
       case 1: {
-        let limit = pushTemporaryLength(bb);
-        message.status = _decodeStatus(bb);
-        bb.limit = limit;
+        message.status = decodeStatus[readVarint32(bb)];
         break;
       }
 
