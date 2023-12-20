@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid')
 const farm = require("../farm.json")
 const fs = require('fs')
 const COWS = './cow.json'
-const INTERVAL = 1000 * 5
+const INTERVAL = 1000 * 5 * 60
 
 
 let cows = []
@@ -203,9 +203,8 @@ class Cow {
 
 const topEntry = async () => {
     await recover()
-
     for (const cow of cows) {
-        cow.handler = setIntferval(async () => {
+        cow.handler = setInterval(async () => {
             switch (await cow.run()) {
                 case 'ok':
                     break
