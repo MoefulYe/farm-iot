@@ -1,5 +1,5 @@
 export const HEARTBEAT_INTERVAL = 1000 * 60 * 5;
-export const LOGGER_LEVEL = process.env.LOGGER_LEVEL || "debug";
+export const LOGGER_LEVEL = Bun.env.LOGGER_LEVEL;
 export const LOCATION = [
   [120.35, 30.31],
   [120.37, 30.31],
@@ -25,8 +25,9 @@ export const fixLongitude = (longitude: number) =>
   fix(longitude, LONGITUDE_BOUND);
 export const fixLatitude = (latitude: number) => fix(latitude, LATITUDE_BOUND);
 
-export const EQMX_HOST = process.env.EQMX_HOST!;
-export const EQMX_PORT = process.env.EQMX_PORT!;
+export const EQMX_HOST = Bun.env.EQMX_HOST;
+export const EQMX_PORT = Bun.env.EQMX_PORT;
 export const EQMX_URL = `mqtt://${EQMX_HOST}:${EQMX_PORT}`;
-export const EQMX_USERNAME = process.env.EQMX_USERNAME!;
-export const EQMX_PASSWORD = process.env.EQMX_PASSWORD!;
+export const EQMX_USERNAME = Bun.env.EQMX_USERNAME;
+export const EQMX_PASSWORD = Bun.env.EQMX_PASSWORD;
+export const FARM = Bun.env.FARM;
