@@ -4,9 +4,6 @@ import {
   EQMX_PASSWORD,
   EQMX_URL,
   EQMX_USERNAME,
-  fix,
-  fixLatitude,
-  fixLongitude,
   HEARTBEAT_INTERVAL,
   LATITUDE_CENTER,
   LONGITUDE_CENTER,
@@ -39,6 +36,8 @@ export interface State {
   chilren: string[];
 }
 
+export const fix = (val: number, [minBound, maxBound]: [number, number]) =>
+  Math.max(minBound, Math.min(maxBound, val));
 export default class Cow {
   private static readonly INIT_HP = 25;
   private static readonly INIT_WEIGHT = 5;
@@ -113,10 +112,18 @@ export default class Cow {
   private listen() {
     this.client.subscribeAsync(`cow/${this.state.uuid}/command/#`);
     const kill = `cow/${this.state.uuid}/command/kill`;
+    const banish = `cow/${this.state.uuid}/command/banish`;
+    const cure = `cow/${this.state.uuid}/command/cure`;
     this.client.on("message", (topic, payload) => {
       switch (topic) {
         case kill:
           this.kill();
+          break;
+        case banish:
+          this.banish();
+          break;
+        case cure:
+          this.cure();
           break;
         default:
       }
@@ -205,6 +212,10 @@ export default class Cow {
     await this.client.unsubscribeAsync(reply);
   }
 
+  private cure(): void {
+    this.state.health = fix(this.state.health + Math.random() * 0.08, [0, 1]);
+  }
+
   private async heartBeat(): Promise<void> {
     const heartBeat = {
       timestamp: new Date().toISOString(),
@@ -240,12 +251,28 @@ export default class Cow {
   private mutateLocation() {
     const delta_lo = (Math.random() - 0.5) * 0.0005;
     const delta_la = (Math.random() - 0.5) * 0.0005;
-    this.state.longitude = fixLongitude(this.state.longitude + delta_lo);
-    this.state.latitude = fixLatitude(this.state.latitude + delta_la);
+    this.state.longitude += delta_lo;
+    this.state.latitude += delta_la;
   }
 
   private mutateWeight() {
     this.state.weight += 5 * (this.state.health - 0.3);
+  }
+
+  private async banish() {
+    const longitude = this.state.longitude;
+    const latitude = this.state.latitude;
+    let delta_lo = LONGITUDE_CENTER - longitude;
+    let delta_la = LATITUDE_CENTER - latitude;
+    const distance = Math.sqrt(delta_lo ** 2 + delta_la ** 2);
+    const unit = 0.002;
+    delta_la *= unit / distance;
+    delta_lo *= unit / distance;
+    this.state.longitude += delta_lo;
+    this.state.latitude += delta_la;
+    logger.info(
+      `cow-${this.state.uuid} is banished from (${longitude}, ${latitude}) to (${this.state.longitude}, ${this.state.latitude})`
+    );
   }
 
   private async ill() {
