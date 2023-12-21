@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package farm.cow.heartbeat;
+
+option go_package = "farm/cow/heartbeat";
+
+message HeartBeat {
+  string timestamp = 1;
+  string token = 2;
+  double latitude = 3;
+  double longitude = 4;
+  double weight = 5;
+  double health = 6;
+}

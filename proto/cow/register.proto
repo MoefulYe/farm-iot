@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-package farm.cow;
-option go_package = "farm/cow";
+package farm.cow.register;
+option go_package = "farm/cow/register";
 
 message RegisterReq {
     string born_at = 1;
@@ -11,9 +11,9 @@ message RegisterReq {
 }
 
 enum Status {
-    OK = 0;
-    ALREADY_REGISTERED = 1;
-    FAILED = 2;
+    STATUS_OK = 0;
+    STATUS_ALREADY_REGISTERED = 1;
+    STATUS_FAILED = 2;
 }
 
 message RegisterResp {

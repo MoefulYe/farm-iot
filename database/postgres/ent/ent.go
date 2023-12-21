@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/MoefulYe/farm-iot/database/postgres/ent/balance"
 	"github.com/MoefulYe/farm-iot/database/postgres/ent/device"
 	"github.com/MoefulYe/farm-iot/database/postgres/ent/user"
 )
@@ -74,8 +75,9 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			device.Table: device.ValidColumn,
-			user.Table:   user.ValidColumn,
+			balance.Table: balance.ValidColumn,
+			device.Table:  device.ValidColumn,
+			user.Table:    user.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

@@ -19,8 +19,8 @@ import {
   decodeRegisterResp,
   Status as RegisterStatus,
 } from "./protoc/register";
-import { encodeKeepAliveMsg } from "./protoc/keep_live";
-import { encodeDie } from "./protoc/die";
+import { encodeHeartBeat } from "./protoc/heartbeat";
+import { encodeDie } from "./protoc/command";
 
 export interface State {
   born_at: string;
@@ -144,11 +144,12 @@ export default class Cow {
         event.removeAllListeners("message");
         if (topic === reply) {
           const resp = decodeLoginResp(payload);
-          if (resp.status === undefined || resp.token === undefined) {
+          resp.status = resp.status ?? LoginStatus.STATUS_OK;
+          if (resp.token === undefined) {
             const msg = `cow-${this.state.uuid} login failed! get invalid package`;
             logger.error(msg);
             reject(msg);
-          } else if (resp.status !== LoginStatus.OK) {
+          } else if (resp.status !== LoginStatus.STATUS_OK) {
             const msg = `cow-${this.state.uuid} login failed! status code ${resp.status}`;
             logger.error(msg);
             reject(msg);
@@ -186,12 +187,12 @@ export default class Cow {
         event.removeAllListeners("message");
         if (topic === reply) {
           const resp = decodeRegisterResp(payload);
-          resp.status = resp.status ?? RegisterStatus.OK;
+          resp.status = resp.status ?? RegisterStatus.STATUS_OK;
           if (resp.uuid === undefined || resp.token === undefined) {
             const msg = `cow-${this.state.uuid} register failed! get invalid package`;
             logger.error(msg);
             reject(msg);
-          } else if (resp.status !== RegisterStatus.OK) {
+          } else if (resp.status !== RegisterStatus.STATUS_OK) {
             const msg = `cow-${this.state.uuid} register failed! status code ${resp.status}`;
             logger.error(msg);
             reject(msg);
@@ -221,17 +222,15 @@ export default class Cow {
     const heartBeat = {
       timestamp: new Date().toISOString(),
       token: this.state.token,
-      geo: {
-        longitude: this.state.longitude,
-        latitude: this.state.latitude,
-      },
+      longitude: this.state.longitude,
+      latitude: this.state.latitude,
       weight: this.state.weight,
       health: this.state.health,
     };
     logger.debug(
       `cow-${this.state.uuid} longitude: ${this.state.longitude}, latitude: ${this.state.latitude}, weight: ${this.state.weight}, health: ${this.state.health}`
     );
-    const pkt = encodeKeepAliveMsg(heartBeat);
+    const pkt = encodeHeartBeat(heartBeat);
     await this.client.publishAsync("cow/keep-alive", Buffer.from(pkt));
   }
 

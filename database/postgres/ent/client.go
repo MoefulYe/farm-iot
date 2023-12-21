@@ -16,6 +16,7 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/MoefulYe/farm-iot/database/postgres/ent/balance"
 	"github.com/MoefulYe/farm-iot/database/postgres/ent/device"
 	"github.com/MoefulYe/farm-iot/database/postgres/ent/user"
 )
@@ -25,6 +26,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// Balance is the client for interacting with the Balance builders.
+	Balance *BalanceClient
 	// Device is the client for interacting with the Device builders.
 	Device *DeviceClient
 	// User is the client for interacting with the User builders.
@@ -42,6 +45,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.Balance = NewBalanceClient(c.config)
 	c.Device = NewDeviceClient(c.config)
 	c.User = NewUserClient(c.config)
 }
@@ -127,10 +131,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Device: NewDeviceClient(cfg),
-		User:   NewUserClient(cfg),
+		ctx:     ctx,
+		config:  cfg,
+		Balance: NewBalanceClient(cfg),
+		Device:  NewDeviceClient(cfg),
+		User:    NewUserClient(cfg),
 	}, nil
 }
 
@@ -148,17 +153,18 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Device: NewDeviceClient(cfg),
-		User:   NewUserClient(cfg),
+		ctx:     ctx,
+		config:  cfg,
+		Balance: NewBalanceClient(cfg),
+		Device:  NewDeviceClient(cfg),
+		User:    NewUserClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Device.
+//		Balance.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -180,6 +186,7 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.Balance.Use(hooks...)
 	c.Device.Use(hooks...)
 	c.User.Use(hooks...)
 }
@@ -187,6 +194,7 @@ func (c *Client) Use(hooks ...Hook) {
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
+	c.Balance.Intercept(interceptors...)
 	c.Device.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
 }
@@ -194,12 +202,147 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *BalanceMutation:
+		return c.Balance.mutate(ctx, m)
 	case *DeviceMutation:
 		return c.Device.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// BalanceClient is a client for the Balance schema.
+type BalanceClient struct {
+	config
+}
+
+// NewBalanceClient returns a client for the Balance from the given config.
+func NewBalanceClient(c config) *BalanceClient {
+	return &BalanceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `balance.Hooks(f(g(h())))`.
+func (c *BalanceClient) Use(hooks ...Hook) {
+	c.hooks.Balance = append(c.hooks.Balance, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `balance.Intercept(f(g(h())))`.
+func (c *BalanceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Balance = append(c.inters.Balance, interceptors...)
+}
+
+// Create returns a builder for creating a Balance entity.
+func (c *BalanceClient) Create() *BalanceCreate {
+	mutation := newBalanceMutation(c.config, OpCreate)
+	return &BalanceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Balance entities.
+func (c *BalanceClient) CreateBulk(builders ...*BalanceCreate) *BalanceCreateBulk {
+	return &BalanceCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *BalanceClient) MapCreateBulk(slice any, setFunc func(*BalanceCreate, int)) *BalanceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &BalanceCreateBulk{err: fmt.Errorf("calling to BalanceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*BalanceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &BalanceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Balance.
+func (c *BalanceClient) Update() *BalanceUpdate {
+	mutation := newBalanceMutation(c.config, OpUpdate)
+	return &BalanceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BalanceClient) UpdateOne(b *Balance) *BalanceUpdateOne {
+	mutation := newBalanceMutation(c.config, OpUpdateOne, withBalance(b))
+	return &BalanceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BalanceClient) UpdateOneID(id int) *BalanceUpdateOne {
+	mutation := newBalanceMutation(c.config, OpUpdateOne, withBalanceID(id))
+	return &BalanceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Balance.
+func (c *BalanceClient) Delete() *BalanceDelete {
+	mutation := newBalanceMutation(c.config, OpDelete)
+	return &BalanceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *BalanceClient) DeleteOne(b *Balance) *BalanceDeleteOne {
+	return c.DeleteOneID(b.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *BalanceClient) DeleteOneID(id int) *BalanceDeleteOne {
+	builder := c.Delete().Where(balance.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BalanceDeleteOne{builder}
+}
+
+// Query returns a query builder for Balance.
+func (c *BalanceClient) Query() *BalanceQuery {
+	return &BalanceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeBalance},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Balance entity by its id.
+func (c *BalanceClient) Get(ctx context.Context, id int) (*Balance, error) {
+	return c.Query().Where(balance.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BalanceClient) GetX(ctx context.Context, id int) *Balance {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *BalanceClient) Hooks() []Hook {
+	return c.hooks.Balance
+}
+
+// Interceptors returns the client interceptors.
+func (c *BalanceClient) Interceptors() []Interceptor {
+	return c.inters.Balance
+}
+
+func (c *BalanceClient) mutate(ctx context.Context, m *BalanceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&BalanceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&BalanceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&BalanceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&BalanceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Balance mutation op: %q", m.Op())
 	}
 }
 
@@ -504,9 +647,9 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Device, User []ent.Hook
+		Balance, Device, User []ent.Hook
 	}
 	inters struct {
-		Device, User []ent.Interceptor
+		Balance, Device, User []ent.Interceptor
 	}
 )

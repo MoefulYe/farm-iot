@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-package farm.cow;
-option go_package = "farm/cow";
+package farm.cow.login;
+option go_package = "farm/cow/login";
 
 message LoginReq {
     string uuid = 1;
@@ -9,9 +9,9 @@ message LoginReq {
 }
 
 enum Status {
-    OK = 0;
-    INVALID_PASSWD = 1;
-    INVALID_UUID = 2;
+    STATUS_OK = 0;
+    STATUS_INVALID_PASSWD = 1;
+    STATUS_INVALID_UUID = 2;
 }
 
 message LoginResp {

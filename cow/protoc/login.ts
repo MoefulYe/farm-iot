@@ -1,19 +1,19 @@
 export const enum Status {
-  OK = "OK",
-  INVALID_PASSWD = "INVALID_PASSWD",
-  INVALID_UUID = "INVALID_UUID",
+  STATUS_OK = "STATUS_OK",
+  STATUS_INVALID_PASSWD = "STATUS_INVALID_PASSWD",
+  STATUS_INVALID_UUID = "STATUS_INVALID_UUID",
 }
 
 export const encodeStatus: { [key: string]: number } = {
-  OK: 0,
-  INVALID_PASSWD: 1,
-  INVALID_UUID: 2,
+  STATUS_OK: 0,
+  STATUS_INVALID_PASSWD: 1,
+  STATUS_INVALID_UUID: 2,
 };
 
 export const decodeStatus: { [key: number]: Status } = {
-  0: Status.OK,
-  1: Status.INVALID_PASSWD,
-  2: Status.INVALID_UUID,
+  0: Status.STATUS_OK,
+  1: Status.STATUS_INVALID_PASSWD,
+  2: Status.STATUS_INVALID_UUID,
 };
 
 export interface LoginReq {

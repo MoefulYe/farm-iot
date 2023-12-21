@@ -8,6 +8,18 @@ import (
 )
 
 var (
+	// BalancesColumns holds the columns for the "balances" table.
+	BalancesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "when", Type: field.TypeTime},
+		{Name: "balance", Type: field.TypeFloat64},
+	}
+	// BalancesTable holds the schema information for the "balances" table.
+	BalancesTable = &schema.Table{
+		Name:       "balances",
+		Columns:    BalancesColumns,
+		PrimaryKey: []*schema.Column{BalancesColumns[0]},
+	}
 	// DevicesColumns holds the columns for the "devices" table.
 	DevicesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
@@ -45,6 +57,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		BalancesTable,
 		DevicesTable,
 		UsersTable,
 	}

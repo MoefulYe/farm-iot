@@ -3,7 +3,7 @@ module github.com/MoefulYe/farm-iot/iot-server
 go 1.21.2
 
 require (
-	github.com/MoefulYe/farm-iot/database/postgres v0.0.0-20231022095424-5f21c5fc60ec
+	github.com/MoefulYe/farm-iot/database/postgres v0.0.0-20231221141119-7764f60d7d6b
 	github.com/eclipse/paho.mqtt.golang v1.4.3
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang/protobuf v1.5.3

@@ -1,79 +1,19 @@
-export interface GeoCoordinate {
-  latitude?: number;
-  longitude?: number;
-}
-
-export function encodeGeoCoordinate(message: GeoCoordinate): Uint8Array {
-  let bb = popByteBuffer();
-  _encodeGeoCoordinate(message, bb);
-  return toUint8Array(bb);
-}
-
-function _encodeGeoCoordinate(message: GeoCoordinate, bb: ByteBuffer): void {
-  // optional double latitude = 1;
-  let $latitude = message.latitude;
-  if ($latitude !== undefined) {
-    writeVarint32(bb, 9);
-    writeDouble(bb, $latitude);
-  }
-
-  // optional double longitude = 2;
-  let $longitude = message.longitude;
-  if ($longitude !== undefined) {
-    writeVarint32(bb, 17);
-    writeDouble(bb, $longitude);
-  }
-}
-
-export function decodeGeoCoordinate(binary: Uint8Array): GeoCoordinate {
-  return _decodeGeoCoordinate(wrapByteBuffer(binary));
-}
-
-function _decodeGeoCoordinate(bb: ByteBuffer): GeoCoordinate {
-  let message: GeoCoordinate = {} as any;
-
-  end_of_message: while (!isAtEnd(bb)) {
-    let tag = readVarint32(bb);
-
-    switch (tag >>> 3) {
-      case 0:
-        break end_of_message;
-
-      // optional double latitude = 1;
-      case 1: {
-        message.latitude = readDouble(bb);
-        break;
-      }
-
-      // optional double longitude = 2;
-      case 2: {
-        message.longitude = readDouble(bb);
-        break;
-      }
-
-      default:
-        skipUnknownField(bb, tag & 7);
-    }
-  }
-
-  return message;
-}
-
-export interface KeepAliveMsg {
+export interface HeartBeat {
   timestamp?: string;
   token?: string;
-  geo?: GeoCoordinate;
+  latitude?: number;
+  longitude?: number;
   weight?: number;
   health?: number;
 }
 
-export function encodeKeepAliveMsg(message: KeepAliveMsg): Uint8Array {
+export function encodeHeartBeat(message: HeartBeat): Uint8Array {
   let bb = popByteBuffer();
-  _encodeKeepAliveMsg(message, bb);
+  _encodeHeartBeat(message, bb);
   return toUint8Array(bb);
 }
 
-function _encodeKeepAliveMsg(message: KeepAliveMsg, bb: ByteBuffer): void {
+function _encodeHeartBeat(message: HeartBeat, bb: ByteBuffer): void {
   // optional string timestamp = 1;
   let $timestamp = message.timestamp;
   if ($timestamp !== undefined) {
@@ -88,38 +28,41 @@ function _encodeKeepAliveMsg(message: KeepAliveMsg, bb: ByteBuffer): void {
     writeString(bb, $token);
   }
 
-  // optional GeoCoordinate geo = 3;
-  let $geo = message.geo;
-  if ($geo !== undefined) {
-    writeVarint32(bb, 26);
-    let nested = popByteBuffer();
-    _encodeGeoCoordinate($geo, nested);
-    writeVarint32(bb, nested.limit);
-    writeByteBuffer(bb, nested);
-    pushByteBuffer(nested);
+  // optional double latitude = 3;
+  let $latitude = message.latitude;
+  if ($latitude !== undefined) {
+    writeVarint32(bb, 25);
+    writeDouble(bb, $latitude);
   }
 
-  // optional double weight = 4;
+  // optional double longitude = 4;
+  let $longitude = message.longitude;
+  if ($longitude !== undefined) {
+    writeVarint32(bb, 33);
+    writeDouble(bb, $longitude);
+  }
+
+  // optional double weight = 5;
   let $weight = message.weight;
   if ($weight !== undefined) {
-    writeVarint32(bb, 33);
+    writeVarint32(bb, 41);
     writeDouble(bb, $weight);
   }
 
-  // optional double health = 5;
+  // optional double health = 6;
   let $health = message.health;
   if ($health !== undefined) {
-    writeVarint32(bb, 41);
+    writeVarint32(bb, 49);
     writeDouble(bb, $health);
   }
 }
 
-export function decodeKeepAliveMsg(binary: Uint8Array): KeepAliveMsg {
-  return _decodeKeepAliveMsg(wrapByteBuffer(binary));
+export function decodeHeartBeat(binary: Uint8Array): HeartBeat {
+  return _decodeHeartBeat(wrapByteBuffer(binary));
 }
 
-function _decodeKeepAliveMsg(bb: ByteBuffer): KeepAliveMsg {
-  let message: KeepAliveMsg = {} as any;
+function _decodeHeartBeat(bb: ByteBuffer): HeartBeat {
+  let message: HeartBeat = {} as any;
 
   end_of_message: while (!isAtEnd(bb)) {
     let tag = readVarint32(bb);
@@ -140,22 +83,26 @@ function _decodeKeepAliveMsg(bb: ByteBuffer): KeepAliveMsg {
         break;
       }
 
-      // optional GeoCoordinate geo = 3;
+      // optional double latitude = 3;
       case 3: {
-        let limit = pushTemporaryLength(bb);
-        message.geo = _decodeGeoCoordinate(bb);
-        bb.limit = limit;
+        message.latitude = readDouble(bb);
         break;
       }
 
-      // optional double weight = 4;
+      // optional double longitude = 4;
       case 4: {
+        message.longitude = readDouble(bb);
+        break;
+      }
+
+      // optional double weight = 5;
+      case 5: {
         message.weight = readDouble(bb);
         break;
       }
 
-      // optional double health = 5;
-      case 5: {
+      // optional double health = 6;
+      case 6: {
         message.health = readDouble(bb);
         break;
       }

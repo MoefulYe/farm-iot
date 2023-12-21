@@ -1,19 +1,19 @@
 export const enum Status {
-  OK = "OK",
-  ALREADY_REGISTERED = "ALREADY_REGISTERED",
-  FAILED = "FAILED",
+  STATUS_OK = "STATUS_OK",
+  STATUS_ALREADY_REGISTERED = "STATUS_ALREADY_REGISTERED",
+  STATUS_FAILED = "STATUS_FAILED",
 }
 
 export const encodeStatus: { [key: string]: number } = {
-  OK: 0,
-  ALREADY_REGISTERED: 1,
-  FAILED: 2,
+  STATUS_OK: 0,
+  STATUS_ALREADY_REGISTERED: 1,
+  STATUS_FAILED: 2,
 };
 
 export const decodeStatus: { [key: number]: Status } = {
-  0: Status.OK,
-  1: Status.ALREADY_REGISTERED,
-  2: Status.FAILED,
+  0: Status.STATUS_OK,
+  1: Status.STATUS_ALREADY_REGISTERED,
+  2: Status.STATUS_FAILED,
 };
 
 export interface RegisterReq {

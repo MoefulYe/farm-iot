@@ -9,6 +9,18 @@ import (
 	"github.com/MoefulYe/farm-iot/database/postgres/ent"
 )
 
+// The BalanceFunc type is an adapter to allow the use of ordinary
+// function as Balance mutator.
+type BalanceFunc func(context.Context, *ent.BalanceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BalanceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.BalanceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BalanceMutation", m)
+}
+
 // The DeviceFunc type is an adapter to allow the use of ordinary
 // function as Device mutator.
 type DeviceFunc func(context.Context, *ent.DeviceMutation) (ent.Value, error)
