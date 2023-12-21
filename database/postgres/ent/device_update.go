@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/MoefulYe/farm-iot/database/postgres/ent/device"
 	"github.com/MoefulYe/farm-iot/database/postgres/ent/predicate"
+	"github.com/google/uuid"
 )
 
 // DeviceUpdate is the builder for updating Device entities.
@@ -25,12 +26,6 @@ type DeviceUpdate struct {
 // Where appends a list predicates to the DeviceUpdate builder.
 func (du *DeviceUpdate) Where(ps ...predicate.Device) *DeviceUpdate {
 	du.mutation.Where(ps...)
-	return du
-}
-
-// SetParent sets the "parent" field.
-func (du *DeviceUpdate) SetParent(s string) *DeviceUpdate {
-	du.mutation.SetParent(s)
 	return du
 }
 
@@ -80,9 +75,70 @@ func (du *DeviceUpdate) ClearReason() *DeviceUpdate {
 	return du
 }
 
+// SetParentID sets the "parent" edge to the Device entity by ID.
+func (du *DeviceUpdate) SetParentID(id uuid.UUID) *DeviceUpdate {
+	du.mutation.SetParentID(id)
+	return du
+}
+
+// SetNillableParentID sets the "parent" edge to the Device entity by ID if the given value is not nil.
+func (du *DeviceUpdate) SetNillableParentID(id *uuid.UUID) *DeviceUpdate {
+	if id != nil {
+		du = du.SetParentID(*id)
+	}
+	return du
+}
+
+// SetParent sets the "parent" edge to the Device entity.
+func (du *DeviceUpdate) SetParent(d *Device) *DeviceUpdate {
+	return du.SetParentID(d.ID)
+}
+
+// AddChildIDs adds the "children" edge to the Device entity by IDs.
+func (du *DeviceUpdate) AddChildIDs(ids ...uuid.UUID) *DeviceUpdate {
+	du.mutation.AddChildIDs(ids...)
+	return du
+}
+
+// AddChildren adds the "children" edges to the Device entity.
+func (du *DeviceUpdate) AddChildren(d ...*Device) *DeviceUpdate {
+	ids := make([]uuid.UUID, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return du.AddChildIDs(ids...)
+}
+
 // Mutation returns the DeviceMutation object of the builder.
 func (du *DeviceUpdate) Mutation() *DeviceMutation {
 	return du.mutation
+}
+
+// ClearParent clears the "parent" edge to the Device entity.
+func (du *DeviceUpdate) ClearParent() *DeviceUpdate {
+	du.mutation.ClearParent()
+	return du
+}
+
+// ClearChildren clears all "children" edges to the Device entity.
+func (du *DeviceUpdate) ClearChildren() *DeviceUpdate {
+	du.mutation.ClearChildren()
+	return du
+}
+
+// RemoveChildIDs removes the "children" edge to Device entities by IDs.
+func (du *DeviceUpdate) RemoveChildIDs(ids ...uuid.UUID) *DeviceUpdate {
+	du.mutation.RemoveChildIDs(ids...)
+	return du
+}
+
+// RemoveChildren removes "children" edges to Device entities.
+func (du *DeviceUpdate) RemoveChildren(d ...*Device) *DeviceUpdate {
+	ids := make([]uuid.UUID, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return du.RemoveChildIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -121,9 +177,6 @@ func (du *DeviceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := du.mutation.Parent(); ok {
-		_spec.SetField(device.FieldParent, field.TypeString, value)
-	}
 	if value, ok := du.mutation.HashedPasswd(); ok {
 		_spec.SetField(device.FieldHashedPasswd, field.TypeString, value)
 	}
@@ -138,6 +191,80 @@ func (du *DeviceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if du.mutation.ReasonCleared() {
 		_spec.ClearField(device.FieldReason, field.TypeString)
+	}
+	if du.mutation.ParentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   device.ParentTable,
+			Columns: []string{device.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := du.mutation.ParentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   device.ParentTable,
+			Columns: []string{device.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if du.mutation.ChildrenCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.ChildrenTable,
+			Columns: []string{device.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := du.mutation.RemovedChildrenIDs(); len(nodes) > 0 && !du.mutation.ChildrenCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.ChildrenTable,
+			Columns: []string{device.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := du.mutation.ChildrenIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.ChildrenTable,
+			Columns: []string{device.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, du.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -157,12 +284,6 @@ type DeviceUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *DeviceMutation
-}
-
-// SetParent sets the "parent" field.
-func (duo *DeviceUpdateOne) SetParent(s string) *DeviceUpdateOne {
-	duo.mutation.SetParent(s)
-	return duo
 }
 
 // SetHashedPasswd sets the "hashed_passwd" field.
@@ -211,9 +332,70 @@ func (duo *DeviceUpdateOne) ClearReason() *DeviceUpdateOne {
 	return duo
 }
 
+// SetParentID sets the "parent" edge to the Device entity by ID.
+func (duo *DeviceUpdateOne) SetParentID(id uuid.UUID) *DeviceUpdateOne {
+	duo.mutation.SetParentID(id)
+	return duo
+}
+
+// SetNillableParentID sets the "parent" edge to the Device entity by ID if the given value is not nil.
+func (duo *DeviceUpdateOne) SetNillableParentID(id *uuid.UUID) *DeviceUpdateOne {
+	if id != nil {
+		duo = duo.SetParentID(*id)
+	}
+	return duo
+}
+
+// SetParent sets the "parent" edge to the Device entity.
+func (duo *DeviceUpdateOne) SetParent(d *Device) *DeviceUpdateOne {
+	return duo.SetParentID(d.ID)
+}
+
+// AddChildIDs adds the "children" edge to the Device entity by IDs.
+func (duo *DeviceUpdateOne) AddChildIDs(ids ...uuid.UUID) *DeviceUpdateOne {
+	duo.mutation.AddChildIDs(ids...)
+	return duo
+}
+
+// AddChildren adds the "children" edges to the Device entity.
+func (duo *DeviceUpdateOne) AddChildren(d ...*Device) *DeviceUpdateOne {
+	ids := make([]uuid.UUID, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return duo.AddChildIDs(ids...)
+}
+
 // Mutation returns the DeviceMutation object of the builder.
 func (duo *DeviceUpdateOne) Mutation() *DeviceMutation {
 	return duo.mutation
+}
+
+// ClearParent clears the "parent" edge to the Device entity.
+func (duo *DeviceUpdateOne) ClearParent() *DeviceUpdateOne {
+	duo.mutation.ClearParent()
+	return duo
+}
+
+// ClearChildren clears all "children" edges to the Device entity.
+func (duo *DeviceUpdateOne) ClearChildren() *DeviceUpdateOne {
+	duo.mutation.ClearChildren()
+	return duo
+}
+
+// RemoveChildIDs removes the "children" edge to Device entities by IDs.
+func (duo *DeviceUpdateOne) RemoveChildIDs(ids ...uuid.UUID) *DeviceUpdateOne {
+	duo.mutation.RemoveChildIDs(ids...)
+	return duo
+}
+
+// RemoveChildren removes "children" edges to Device entities.
+func (duo *DeviceUpdateOne) RemoveChildren(d ...*Device) *DeviceUpdateOne {
+	ids := make([]uuid.UUID, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return duo.RemoveChildIDs(ids...)
 }
 
 // Where appends a list predicates to the DeviceUpdate builder.
@@ -282,9 +464,6 @@ func (duo *DeviceUpdateOne) sqlSave(ctx context.Context) (_node *Device, err err
 			}
 		}
 	}
-	if value, ok := duo.mutation.Parent(); ok {
-		_spec.SetField(device.FieldParent, field.TypeString, value)
-	}
 	if value, ok := duo.mutation.HashedPasswd(); ok {
 		_spec.SetField(device.FieldHashedPasswd, field.TypeString, value)
 	}
@@ -299,6 +478,80 @@ func (duo *DeviceUpdateOne) sqlSave(ctx context.Context) (_node *Device, err err
 	}
 	if duo.mutation.ReasonCleared() {
 		_spec.ClearField(device.FieldReason, field.TypeString)
+	}
+	if duo.mutation.ParentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   device.ParentTable,
+			Columns: []string{device.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := duo.mutation.ParentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   device.ParentTable,
+			Columns: []string{device.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if duo.mutation.ChildrenCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.ChildrenTable,
+			Columns: []string{device.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := duo.mutation.RemovedChildrenIDs(); len(nodes) > 0 && !duo.mutation.ChildrenCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.ChildrenTable,
+			Columns: []string{device.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := duo.mutation.ChildrenIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.ChildrenTable,
+			Columns: []string{device.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Device{config: duo.config}
 	_spec.Assign = _node.assignValues

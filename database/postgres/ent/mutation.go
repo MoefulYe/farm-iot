@@ -33,18 +33,22 @@ const (
 // DeviceMutation represents an operation that mutates the Device nodes in the graph.
 type DeviceMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *uuid.UUID
-	born_at       *time.Time
-	parent        *string
-	hashed_passwd *string
-	dead_at       *time.Time
-	reason        *string
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*Device, error)
-	predicates    []predicate.Device
+	op              Op
+	typ             string
+	id              *uuid.UUID
+	born_at         *time.Time
+	hashed_passwd   *string
+	dead_at         *time.Time
+	reason          *string
+	clearedFields   map[string]struct{}
+	parent          *uuid.UUID
+	clearedparent   bool
+	children        map[uuid.UUID]struct{}
+	removedchildren map[uuid.UUID]struct{}
+	clearedchildren bool
+	done            bool
+	oldValue        func(context.Context) (*Device, error)
+	predicates      []predicate.Device
 }
 
 var _ ent.Mutation = (*DeviceMutation)(nil)
@@ -187,42 +191,6 @@ func (m *DeviceMutation) ResetBornAt() {
 	m.born_at = nil
 }
 
-// SetParent sets the "parent" field.
-func (m *DeviceMutation) SetParent(s string) {
-	m.parent = &s
-}
-
-// Parent returns the value of the "parent" field in the mutation.
-func (m *DeviceMutation) Parent() (r string, exists bool) {
-	v := m.parent
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldParent returns the old "parent" field's value of the Device entity.
-// If the Device object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DeviceMutation) OldParent(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldParent is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldParent requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldParent: %w", err)
-	}
-	return oldValue.Parent, nil
-}
-
-// ResetParent resets all changes to the "parent" field.
-func (m *DeviceMutation) ResetParent() {
-	m.parent = nil
-}
-
 // SetHashedPasswd sets the "hashed_passwd" field.
 func (m *DeviceMutation) SetHashedPasswd(s string) {
 	m.hashed_passwd = &s
@@ -357,6 +325,99 @@ func (m *DeviceMutation) ResetReason() {
 	delete(m.clearedFields, device.FieldReason)
 }
 
+// SetParentID sets the "parent" edge to the Device entity by id.
+func (m *DeviceMutation) SetParentID(id uuid.UUID) {
+	m.parent = &id
+}
+
+// ClearParent clears the "parent" edge to the Device entity.
+func (m *DeviceMutation) ClearParent() {
+	m.clearedparent = true
+}
+
+// ParentCleared reports if the "parent" edge to the Device entity was cleared.
+func (m *DeviceMutation) ParentCleared() bool {
+	return m.clearedparent
+}
+
+// ParentID returns the "parent" edge ID in the mutation.
+func (m *DeviceMutation) ParentID() (id uuid.UUID, exists bool) {
+	if m.parent != nil {
+		return *m.parent, true
+	}
+	return
+}
+
+// ParentIDs returns the "parent" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ParentID instead. It exists only for internal usage by the builders.
+func (m *DeviceMutation) ParentIDs() (ids []uuid.UUID) {
+	if id := m.parent; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetParent resets all changes to the "parent" edge.
+func (m *DeviceMutation) ResetParent() {
+	m.parent = nil
+	m.clearedparent = false
+}
+
+// AddChildIDs adds the "children" edge to the Device entity by ids.
+func (m *DeviceMutation) AddChildIDs(ids ...uuid.UUID) {
+	if m.children == nil {
+		m.children = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.children[ids[i]] = struct{}{}
+	}
+}
+
+// ClearChildren clears the "children" edge to the Device entity.
+func (m *DeviceMutation) ClearChildren() {
+	m.clearedchildren = true
+}
+
+// ChildrenCleared reports if the "children" edge to the Device entity was cleared.
+func (m *DeviceMutation) ChildrenCleared() bool {
+	return m.clearedchildren
+}
+
+// RemoveChildIDs removes the "children" edge to the Device entity by IDs.
+func (m *DeviceMutation) RemoveChildIDs(ids ...uuid.UUID) {
+	if m.removedchildren == nil {
+		m.removedchildren = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.children, ids[i])
+		m.removedchildren[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedChildren returns the removed IDs of the "children" edge to the Device entity.
+func (m *DeviceMutation) RemovedChildrenIDs() (ids []uuid.UUID) {
+	for id := range m.removedchildren {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ChildrenIDs returns the "children" edge IDs in the mutation.
+func (m *DeviceMutation) ChildrenIDs() (ids []uuid.UUID) {
+	for id := range m.children {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetChildren resets all changes to the "children" edge.
+func (m *DeviceMutation) ResetChildren() {
+	m.children = nil
+	m.clearedchildren = false
+	m.removedchildren = nil
+}
+
 // Where appends a list predicates to the DeviceMutation builder.
 func (m *DeviceMutation) Where(ps ...predicate.Device) {
 	m.predicates = append(m.predicates, ps...)
@@ -391,12 +452,9 @@ func (m *DeviceMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *DeviceMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 4)
 	if m.born_at != nil {
 		fields = append(fields, device.FieldBornAt)
-	}
-	if m.parent != nil {
-		fields = append(fields, device.FieldParent)
 	}
 	if m.hashed_passwd != nil {
 		fields = append(fields, device.FieldHashedPasswd)
@@ -417,8 +475,6 @@ func (m *DeviceMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case device.FieldBornAt:
 		return m.BornAt()
-	case device.FieldParent:
-		return m.Parent()
 	case device.FieldHashedPasswd:
 		return m.HashedPasswd()
 	case device.FieldDeadAt:
@@ -436,8 +492,6 @@ func (m *DeviceMutation) OldField(ctx context.Context, name string) (ent.Value, 
 	switch name {
 	case device.FieldBornAt:
 		return m.OldBornAt(ctx)
-	case device.FieldParent:
-		return m.OldParent(ctx)
 	case device.FieldHashedPasswd:
 		return m.OldHashedPasswd(ctx)
 	case device.FieldDeadAt:
@@ -459,13 +513,6 @@ func (m *DeviceMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetBornAt(v)
-		return nil
-	case device.FieldParent:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetParent(v)
 		return nil
 	case device.FieldHashedPasswd:
 		v, ok := value.(string)
@@ -555,9 +602,6 @@ func (m *DeviceMutation) ResetField(name string) error {
 	case device.FieldBornAt:
 		m.ResetBornAt()
 		return nil
-	case device.FieldParent:
-		m.ResetParent()
-		return nil
 	case device.FieldHashedPasswd:
 		m.ResetHashedPasswd()
 		return nil
@@ -573,49 +617,103 @@ func (m *DeviceMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *DeviceMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
+	if m.parent != nil {
+		edges = append(edges, device.EdgeParent)
+	}
+	if m.children != nil {
+		edges = append(edges, device.EdgeChildren)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *DeviceMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case device.EdgeParent:
+		if id := m.parent; id != nil {
+			return []ent.Value{*id}
+		}
+	case device.EdgeChildren:
+		ids := make([]ent.Value, 0, len(m.children))
+		for id := range m.children {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *DeviceMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
+	if m.removedchildren != nil {
+		edges = append(edges, device.EdgeChildren)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *DeviceMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case device.EdgeChildren:
+		ids := make([]ent.Value, 0, len(m.removedchildren))
+		for id := range m.removedchildren {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *DeviceMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
+	if m.clearedparent {
+		edges = append(edges, device.EdgeParent)
+	}
+	if m.clearedchildren {
+		edges = append(edges, device.EdgeChildren)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *DeviceMutation) EdgeCleared(name string) bool {
+	switch name {
+	case device.EdgeParent:
+		return m.clearedparent
+	case device.EdgeChildren:
+		return m.clearedchildren
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *DeviceMutation) ClearEdge(name string) error {
+	switch name {
+	case device.EdgeParent:
+		m.ClearParent()
+		return nil
+	}
 	return fmt.Errorf("unknown Device unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *DeviceMutation) ResetEdge(name string) error {
+	switch name {
+	case device.EdgeParent:
+		m.ResetParent()
+		return nil
+	case device.EdgeChildren:
+		m.ResetChildren()
+		return nil
+	}
 	return fmt.Errorf("unknown Device edge %s", name)
 }
 

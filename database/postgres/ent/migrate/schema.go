@@ -12,16 +12,24 @@ var (
 	DevicesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "born_at", Type: field.TypeTime},
-		{Name: "parent", Type: field.TypeString},
 		{Name: "hashed_passwd", Type: field.TypeString},
 		{Name: "dead_at", Type: field.TypeTime, Nullable: true},
 		{Name: "reason", Type: field.TypeString, Nullable: true},
+		{Name: "device_children", Type: field.TypeUUID, Nullable: true},
 	}
 	// DevicesTable holds the schema information for the "devices" table.
 	DevicesTable = &schema.Table{
 		Name:       "devices",
 		Columns:    DevicesColumns,
 		PrimaryKey: []*schema.Column{DevicesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "devices_devices_children",
+				Columns:    []*schema.Column{DevicesColumns[5]},
+				RefColumns: []*schema.Column{DevicesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
@@ -43,4 +51,5 @@ var (
 )
 
 func init() {
+	DevicesTable.ForeignKeys[0].RefTable = DevicesTable
 }

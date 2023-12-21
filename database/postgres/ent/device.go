@@ -20,15 +20,50 @@ type Device struct {
 	ID uuid.UUID `json:"id,omitempty"`
 	// BornAt holds the value of the "born_at" field.
 	BornAt time.Time `json:"born_at,omitempty"`
-	// Parent holds the value of the "parent" field.
-	Parent string `json:"parent,omitempty"`
 	// HashedPasswd holds the value of the "hashed_passwd" field.
 	HashedPasswd string `json:"hashed_passwd,omitempty"`
 	// DeadAt holds the value of the "dead_at" field.
 	DeadAt *time.Time `json:"dead_at,omitempty"`
 	// Reason holds the value of the "reason" field.
-	Reason       *string `json:"reason,omitempty"`
-	selectValues sql.SelectValues
+	Reason *string `json:"reason,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the DeviceQuery when eager-loading is set.
+	Edges           DeviceEdges `json:"edges"`
+	device_children *uuid.UUID
+	selectValues    sql.SelectValues
+}
+
+// DeviceEdges holds the relations/edges for other nodes in the graph.
+type DeviceEdges struct {
+	// Parent holds the value of the parent edge.
+	Parent *Device `json:"parent,omitempty"`
+	// Children holds the value of the children edge.
+	Children []*Device `json:"children,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// ParentOrErr returns the Parent value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e DeviceEdges) ParentOrErr() (*Device, error) {
+	if e.loadedTypes[0] {
+		if e.Parent == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: device.Label}
+		}
+		return e.Parent, nil
+	}
+	return nil, &NotLoadedError{edge: "parent"}
+}
+
+// ChildrenOrErr returns the Children value or an error if the edge
+// was not loaded in eager-loading.
+func (e DeviceEdges) ChildrenOrErr() ([]*Device, error) {
+	if e.loadedTypes[1] {
+		return e.Children, nil
+	}
+	return nil, &NotLoadedError{edge: "children"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -36,12 +71,14 @@ func (*Device) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case device.FieldParent, device.FieldHashedPasswd, device.FieldReason:
+		case device.FieldHashedPasswd, device.FieldReason:
 			values[i] = new(sql.NullString)
 		case device.FieldBornAt, device.FieldDeadAt:
 			values[i] = new(sql.NullTime)
 		case device.FieldID:
 			values[i] = new(uuid.UUID)
+		case device.ForeignKeys[0]: // device_children
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -69,12 +106,6 @@ func (d *Device) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				d.BornAt = value.Time
 			}
-		case device.FieldParent:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field parent", values[i])
-			} else if value.Valid {
-				d.Parent = value.String
-			}
 		case device.FieldHashedPasswd:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field hashed_passwd", values[i])
@@ -95,6 +126,13 @@ func (d *Device) assignValues(columns []string, values []any) error {
 				d.Reason = new(string)
 				*d.Reason = value.String
 			}
+		case device.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field device_children", values[i])
+			} else if value.Valid {
+				d.device_children = new(uuid.UUID)
+				*d.device_children = *value.S.(*uuid.UUID)
+			}
 		default:
 			d.selectValues.Set(columns[i], values[i])
 		}
@@ -106,6 +144,16 @@ func (d *Device) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (d *Device) Value(name string) (ent.Value, error) {
 	return d.selectValues.Get(name)
+}
+
+// QueryParent queries the "parent" edge of the Device entity.
+func (d *Device) QueryParent() *DeviceQuery {
+	return NewDeviceClient(d.config).QueryParent(d)
+}
+
+// QueryChildren queries the "children" edge of the Device entity.
+func (d *Device) QueryChildren() *DeviceQuery {
+	return NewDeviceClient(d.config).QueryChildren(d)
 }
 
 // Update returns a builder for updating this Device.
@@ -133,9 +181,6 @@ func (d *Device) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", d.ID))
 	builder.WriteString("born_at=")
 	builder.WriteString(d.BornAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("parent=")
-	builder.WriteString(d.Parent)
 	builder.WriteString(", ")
 	builder.WriteString("hashed_passwd=")
 	builder.WriteString(d.HashedPasswd)

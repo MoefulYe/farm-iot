@@ -27,12 +27,6 @@ func (dc *DeviceCreate) SetBornAt(t time.Time) *DeviceCreate {
 	return dc
 }
 
-// SetParent sets the "parent" field.
-func (dc *DeviceCreate) SetParent(s string) *DeviceCreate {
-	dc.mutation.SetParent(s)
-	return dc
-}
-
 // SetHashedPasswd sets the "hashed_passwd" field.
 func (dc *DeviceCreate) SetHashedPasswd(s string) *DeviceCreate {
 	dc.mutation.SetHashedPasswd(s)
@@ -73,6 +67,40 @@ func (dc *DeviceCreate) SetID(u uuid.UUID) *DeviceCreate {
 	return dc
 }
 
+// SetParentID sets the "parent" edge to the Device entity by ID.
+func (dc *DeviceCreate) SetParentID(id uuid.UUID) *DeviceCreate {
+	dc.mutation.SetParentID(id)
+	return dc
+}
+
+// SetNillableParentID sets the "parent" edge to the Device entity by ID if the given value is not nil.
+func (dc *DeviceCreate) SetNillableParentID(id *uuid.UUID) *DeviceCreate {
+	if id != nil {
+		dc = dc.SetParentID(*id)
+	}
+	return dc
+}
+
+// SetParent sets the "parent" edge to the Device entity.
+func (dc *DeviceCreate) SetParent(d *Device) *DeviceCreate {
+	return dc.SetParentID(d.ID)
+}
+
+// AddChildIDs adds the "children" edge to the Device entity by IDs.
+func (dc *DeviceCreate) AddChildIDs(ids ...uuid.UUID) *DeviceCreate {
+	dc.mutation.AddChildIDs(ids...)
+	return dc
+}
+
+// AddChildren adds the "children" edges to the Device entity.
+func (dc *DeviceCreate) AddChildren(d ...*Device) *DeviceCreate {
+	ids := make([]uuid.UUID, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return dc.AddChildIDs(ids...)
+}
+
 // Mutation returns the DeviceMutation object of the builder.
 func (dc *DeviceCreate) Mutation() *DeviceMutation {
 	return dc.mutation
@@ -109,9 +137,6 @@ func (dc *DeviceCreate) ExecX(ctx context.Context) {
 func (dc *DeviceCreate) check() error {
 	if _, ok := dc.mutation.BornAt(); !ok {
 		return &ValidationError{Name: "born_at", err: errors.New(`ent: missing required field "Device.born_at"`)}
-	}
-	if _, ok := dc.mutation.Parent(); !ok {
-		return &ValidationError{Name: "parent", err: errors.New(`ent: missing required field "Device.parent"`)}
 	}
 	if _, ok := dc.mutation.HashedPasswd(); !ok {
 		return &ValidationError{Name: "hashed_passwd", err: errors.New(`ent: missing required field "Device.hashed_passwd"`)}
@@ -155,10 +180,6 @@ func (dc *DeviceCreate) createSpec() (*Device, *sqlgraph.CreateSpec) {
 		_spec.SetField(device.FieldBornAt, field.TypeTime, value)
 		_node.BornAt = value
 	}
-	if value, ok := dc.mutation.Parent(); ok {
-		_spec.SetField(device.FieldParent, field.TypeString, value)
-		_node.Parent = value
-	}
 	if value, ok := dc.mutation.HashedPasswd(); ok {
 		_spec.SetField(device.FieldHashedPasswd, field.TypeString, value)
 		_node.HashedPasswd = value
@@ -170,6 +191,39 @@ func (dc *DeviceCreate) createSpec() (*Device, *sqlgraph.CreateSpec) {
 	if value, ok := dc.mutation.Reason(); ok {
 		_spec.SetField(device.FieldReason, field.TypeString, value)
 		_node.Reason = &value
+	}
+	if nodes := dc.mutation.ParentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   device.ParentTable,
+			Columns: []string{device.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.device_children = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := dc.mutation.ChildrenIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.ChildrenTable,
+			Columns: []string{device.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 )
@@ -16,7 +17,6 @@ func (Device) Fields() []ent.Field {
 	return []ent.Field{
 		field.Time("born_at").Immutable(),
 		field.UUID("id", uuid.UUID{}).Immutable().Unique(),
-		field.String("parent"),
 		field.String("hashed_passwd"),
 		field.Time("dead_at").Optional().Nillable(),
 		field.String("reason").Optional().Nillable(),
@@ -25,5 +25,7 @@ func (Device) Fields() []ent.Field {
 
 // Edges of the Device.
 func (Device) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.To("children", Device.Type).From("parent").Unique(),
+	}
 }

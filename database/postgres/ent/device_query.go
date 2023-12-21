@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -18,10 +19,13 @@ import (
 // DeviceQuery is the builder for querying Device entities.
 type DeviceQuery struct {
 	config
-	ctx        *QueryContext
-	order      []device.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Device
+	ctx          *QueryContext
+	order        []device.OrderOption
+	inters       []Interceptor
+	predicates   []predicate.Device
+	withParent   *DeviceQuery
+	withChildren *DeviceQuery
+	withFKs      bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -56,6 +60,50 @@ func (dq *DeviceQuery) Unique(unique bool) *DeviceQuery {
 func (dq *DeviceQuery) Order(o ...device.OrderOption) *DeviceQuery {
 	dq.order = append(dq.order, o...)
 	return dq
+}
+
+// QueryParent chains the current query on the "parent" edge.
+func (dq *DeviceQuery) QueryParent() *DeviceQuery {
+	query := (&DeviceClient{config: dq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := dq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := dq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(device.Table, device.FieldID, selector),
+			sqlgraph.To(device.Table, device.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, device.ParentTable, device.ParentColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(dq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryChildren chains the current query on the "children" edge.
+func (dq *DeviceQuery) QueryChildren() *DeviceQuery {
+	query := (&DeviceClient{config: dq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := dq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := dq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(device.Table, device.FieldID, selector),
+			sqlgraph.To(device.Table, device.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, device.ChildrenTable, device.ChildrenColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(dq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Device entity from the query.
@@ -245,15 +293,39 @@ func (dq *DeviceQuery) Clone() *DeviceQuery {
 		return nil
 	}
 	return &DeviceQuery{
-		config:     dq.config,
-		ctx:        dq.ctx.Clone(),
-		order:      append([]device.OrderOption{}, dq.order...),
-		inters:     append([]Interceptor{}, dq.inters...),
-		predicates: append([]predicate.Device{}, dq.predicates...),
+		config:       dq.config,
+		ctx:          dq.ctx.Clone(),
+		order:        append([]device.OrderOption{}, dq.order...),
+		inters:       append([]Interceptor{}, dq.inters...),
+		predicates:   append([]predicate.Device{}, dq.predicates...),
+		withParent:   dq.withParent.Clone(),
+		withChildren: dq.withChildren.Clone(),
 		// clone intermediate query.
 		sql:  dq.sql.Clone(),
 		path: dq.path,
 	}
+}
+
+// WithParent tells the query-builder to eager-load the nodes that are connected to
+// the "parent" edge. The optional arguments are used to configure the query builder of the edge.
+func (dq *DeviceQuery) WithParent(opts ...func(*DeviceQuery)) *DeviceQuery {
+	query := (&DeviceClient{config: dq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	dq.withParent = query
+	return dq
+}
+
+// WithChildren tells the query-builder to eager-load the nodes that are connected to
+// the "children" edge. The optional arguments are used to configure the query builder of the edge.
+func (dq *DeviceQuery) WithChildren(opts ...func(*DeviceQuery)) *DeviceQuery {
+	query := (&DeviceClient{config: dq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	dq.withChildren = query
+	return dq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -332,15 +404,27 @@ func (dq *DeviceQuery) prepareQuery(ctx context.Context) error {
 
 func (dq *DeviceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Device, error) {
 	var (
-		nodes = []*Device{}
-		_spec = dq.querySpec()
+		nodes       = []*Device{}
+		withFKs     = dq.withFKs
+		_spec       = dq.querySpec()
+		loadedTypes = [2]bool{
+			dq.withParent != nil,
+			dq.withChildren != nil,
+		}
 	)
+	if dq.withParent != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, device.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Device).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Device{config: dq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -352,7 +436,84 @@ func (dq *DeviceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Devic
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := dq.withParent; query != nil {
+		if err := dq.loadParent(ctx, query, nodes, nil,
+			func(n *Device, e *Device) { n.Edges.Parent = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := dq.withChildren; query != nil {
+		if err := dq.loadChildren(ctx, query, nodes,
+			func(n *Device) { n.Edges.Children = []*Device{} },
+			func(n *Device, e *Device) { n.Edges.Children = append(n.Edges.Children, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (dq *DeviceQuery) loadParent(ctx context.Context, query *DeviceQuery, nodes []*Device, init func(*Device), assign func(*Device, *Device)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Device)
+	for i := range nodes {
+		if nodes[i].device_children == nil {
+			continue
+		}
+		fk := *nodes[i].device_children
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(device.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "device_children" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (dq *DeviceQuery) loadChildren(ctx context.Context, query *DeviceQuery, nodes []*Device, init func(*Device), assign func(*Device, *Device)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Device)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Device(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(device.ChildrenColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.device_children
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "device_children" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "device_children" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
 }
 
 func (dq *DeviceQuery) sqlCount(ctx context.Context) (int, error) {
