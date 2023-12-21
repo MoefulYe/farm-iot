@@ -7,7 +7,9 @@ export default winston.createLogger({
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
-        winston.format.timestamp(),
+        winston.format.timestamp({
+          format: "YYYY-MM-DDTHH:mm:ss.SSSZZ",
+        }),
         winston.format.printf((info) => {
           return `[${info.timestamp} ${info.level}] ${info.message}`;
         })
