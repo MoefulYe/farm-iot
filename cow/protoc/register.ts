@@ -20,6 +20,7 @@ export interface RegisterReq {
   born_at?: string;
   uuid?: string;
   passwd?: string;
+  parent?: string;
 }
 
 export function encodeRegisterReq(message: RegisterReq): Uint8Array {
@@ -48,6 +49,13 @@ function _encodeRegisterReq(message: RegisterReq, bb: ByteBuffer): void {
   if ($passwd !== undefined) {
     writeVarint32(bb, 26);
     writeString(bb, $passwd);
+  }
+
+  // optional string parent = 4;
+  let $parent = message.parent;
+  if ($parent !== undefined) {
+    writeVarint32(bb, 34);
+    writeString(bb, $parent);
   }
 }
 
@@ -80,6 +88,12 @@ function _decodeRegisterReq(bb: ByteBuffer): RegisterReq {
       // optional string passwd = 3;
       case 3: {
         message.passwd = readString(bb, readVarint32(bb));
+        break;
+      }
+
+      // optional string parent = 4;
+      case 4: {
+        message.parent = readString(bb, readVarint32(bb));
         break;
       }
 

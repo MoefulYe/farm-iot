@@ -28,6 +28,12 @@ func (du *DeviceUpdate) Where(ps ...predicate.Device) *DeviceUpdate {
 	return du
 }
 
+// SetParent sets the "parent" field.
+func (du *DeviceUpdate) SetParent(s string) *DeviceUpdate {
+	du.mutation.SetParent(s)
+	return du
+}
+
 // SetHashedPasswd sets the "hashed_passwd" field.
 func (du *DeviceUpdate) SetHashedPasswd(s string) *DeviceUpdate {
 	du.mutation.SetHashedPasswd(s)
@@ -115,6 +121,9 @@ func (du *DeviceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := du.mutation.Parent(); ok {
+		_spec.SetField(device.FieldParent, field.TypeString, value)
+	}
 	if value, ok := du.mutation.HashedPasswd(); ok {
 		_spec.SetField(device.FieldHashedPasswd, field.TypeString, value)
 	}
@@ -148,6 +157,12 @@ type DeviceUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *DeviceMutation
+}
+
+// SetParent sets the "parent" field.
+func (duo *DeviceUpdateOne) SetParent(s string) *DeviceUpdateOne {
+	duo.mutation.SetParent(s)
+	return duo
 }
 
 // SetHashedPasswd sets the "hashed_passwd" field.
@@ -266,6 +281,9 @@ func (duo *DeviceUpdateOne) sqlSave(ctx context.Context) (_node *Device, err err
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := duo.mutation.Parent(); ok {
+		_spec.SetField(device.FieldParent, field.TypeString, value)
 	}
 	if value, ok := duo.mutation.HashedPasswd(); ok {
 		_spec.SetField(device.FieldHashedPasswd, field.TypeString, value)

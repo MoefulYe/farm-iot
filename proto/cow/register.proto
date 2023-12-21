@@ -7,6 +7,7 @@ message RegisterReq {
     string born_at = 1;
     string uuid = 2;
     string passwd = 3;
+    string parent = 4;
 }
 
 enum Status {

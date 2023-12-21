@@ -12,6 +12,7 @@ var (
 	DevicesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "born_at", Type: field.TypeTime},
+		{Name: "parent", Type: field.TypeString},
 		{Name: "hashed_passwd", Type: field.TypeString},
 		{Name: "dead_at", Type: field.TypeTime, Nullable: true},
 		{Name: "reason", Type: field.TypeString, Nullable: true},

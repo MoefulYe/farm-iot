@@ -113,8 +113,8 @@ export default class Cow {
     this.client.subscribeAsync(`cow/${this.state.uuid}/command/#`);
     const kill = `cow/${this.state.uuid}/command/kill`;
     const banish = `cow/${this.state.uuid}/command/banish`;
-    const cure = `cow/${this.state.uuid}/command/cure`;
-    this.client.on("message", (topic, payload) => {
+    const cure = "cow/command/cure";
+    this.client.on("message", (topic, _) => {
       switch (topic) {
         case kill:
           this.kill();
@@ -176,6 +176,7 @@ export default class Cow {
       born_at: this.state.born_at,
       uuid: this.state.uuid,
       passwd: this.state.passwd,
+      parent: this.state.parent,
     });
     await this.client.subscribeAsync(reply);
     await this.client.publishAsync("cow/register", Buffer.from(req));

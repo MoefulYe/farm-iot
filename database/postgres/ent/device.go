@@ -20,6 +20,8 @@ type Device struct {
 	ID uuid.UUID `json:"id,omitempty"`
 	// BornAt holds the value of the "born_at" field.
 	BornAt time.Time `json:"born_at,omitempty"`
+	// Parent holds the value of the "parent" field.
+	Parent string `json:"parent,omitempty"`
 	// HashedPasswd holds the value of the "hashed_passwd" field.
 	HashedPasswd string `json:"hashed_passwd,omitempty"`
 	// DeadAt holds the value of the "dead_at" field.
@@ -34,7 +36,7 @@ func (*Device) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case device.FieldHashedPasswd, device.FieldReason:
+		case device.FieldParent, device.FieldHashedPasswd, device.FieldReason:
 			values[i] = new(sql.NullString)
 		case device.FieldBornAt, device.FieldDeadAt:
 			values[i] = new(sql.NullTime)
@@ -66,6 +68,12 @@ func (d *Device) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field born_at", values[i])
 			} else if value.Valid {
 				d.BornAt = value.Time
+			}
+		case device.FieldParent:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field parent", values[i])
+			} else if value.Valid {
+				d.Parent = value.String
 			}
 		case device.FieldHashedPasswd:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -125,6 +133,9 @@ func (d *Device) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", d.ID))
 	builder.WriteString("born_at=")
 	builder.WriteString(d.BornAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("parent=")
+	builder.WriteString(d.Parent)
 	builder.WriteString(", ")
 	builder.WriteString("hashed_passwd=")
 	builder.WriteString(d.HashedPasswd)

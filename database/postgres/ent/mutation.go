@@ -37,6 +37,7 @@ type DeviceMutation struct {
 	typ           string
 	id            *uuid.UUID
 	born_at       *time.Time
+	parent        *string
 	hashed_passwd *string
 	dead_at       *time.Time
 	reason        *string
@@ -184,6 +185,42 @@ func (m *DeviceMutation) OldBornAt(ctx context.Context) (v time.Time, err error)
 // ResetBornAt resets all changes to the "born_at" field.
 func (m *DeviceMutation) ResetBornAt() {
 	m.born_at = nil
+}
+
+// SetParent sets the "parent" field.
+func (m *DeviceMutation) SetParent(s string) {
+	m.parent = &s
+}
+
+// Parent returns the value of the "parent" field in the mutation.
+func (m *DeviceMutation) Parent() (r string, exists bool) {
+	v := m.parent
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldParent returns the old "parent" field's value of the Device entity.
+// If the Device object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceMutation) OldParent(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldParent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldParent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldParent: %w", err)
+	}
+	return oldValue.Parent, nil
+}
+
+// ResetParent resets all changes to the "parent" field.
+func (m *DeviceMutation) ResetParent() {
+	m.parent = nil
 }
 
 // SetHashedPasswd sets the "hashed_passwd" field.
@@ -354,9 +391,12 @@ func (m *DeviceMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *DeviceMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.born_at != nil {
 		fields = append(fields, device.FieldBornAt)
+	}
+	if m.parent != nil {
+		fields = append(fields, device.FieldParent)
 	}
 	if m.hashed_passwd != nil {
 		fields = append(fields, device.FieldHashedPasswd)
@@ -377,6 +417,8 @@ func (m *DeviceMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case device.FieldBornAt:
 		return m.BornAt()
+	case device.FieldParent:
+		return m.Parent()
 	case device.FieldHashedPasswd:
 		return m.HashedPasswd()
 	case device.FieldDeadAt:
@@ -394,6 +436,8 @@ func (m *DeviceMutation) OldField(ctx context.Context, name string) (ent.Value, 
 	switch name {
 	case device.FieldBornAt:
 		return m.OldBornAt(ctx)
+	case device.FieldParent:
+		return m.OldParent(ctx)
 	case device.FieldHashedPasswd:
 		return m.OldHashedPasswd(ctx)
 	case device.FieldDeadAt:
@@ -415,6 +459,13 @@ func (m *DeviceMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetBornAt(v)
+		return nil
+	case device.FieldParent:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetParent(v)
 		return nil
 	case device.FieldHashedPasswd:
 		v, ok := value.(string)
@@ -503,6 +554,9 @@ func (m *DeviceMutation) ResetField(name string) error {
 	switch name {
 	case device.FieldBornAt:
 		m.ResetBornAt()
+		return nil
+	case device.FieldParent:
+		m.ResetParent()
 		return nil
 	case device.FieldHashedPasswd:
 		m.ResetHashedPasswd()

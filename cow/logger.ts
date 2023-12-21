@@ -9,7 +9,7 @@ export default winston.createLogger({
         winston.format.colorize(),
         winston.format.timestamp(),
         winston.format.printf((info) => {
-          return `${info.timestamp} ${info.level}: ${info.message}`;
+          return `[${info.timestamp} ${info.level}] ${info.message}`;
         })
       ),
     }),

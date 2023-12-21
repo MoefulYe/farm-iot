@@ -27,6 +27,12 @@ func (dc *DeviceCreate) SetBornAt(t time.Time) *DeviceCreate {
 	return dc
 }
 
+// SetParent sets the "parent" field.
+func (dc *DeviceCreate) SetParent(s string) *DeviceCreate {
+	dc.mutation.SetParent(s)
+	return dc
+}
+
 // SetHashedPasswd sets the "hashed_passwd" field.
 func (dc *DeviceCreate) SetHashedPasswd(s string) *DeviceCreate {
 	dc.mutation.SetHashedPasswd(s)
@@ -104,6 +110,9 @@ func (dc *DeviceCreate) check() error {
 	if _, ok := dc.mutation.BornAt(); !ok {
 		return &ValidationError{Name: "born_at", err: errors.New(`ent: missing required field "Device.born_at"`)}
 	}
+	if _, ok := dc.mutation.Parent(); !ok {
+		return &ValidationError{Name: "parent", err: errors.New(`ent: missing required field "Device.parent"`)}
+	}
 	if _, ok := dc.mutation.HashedPasswd(); !ok {
 		return &ValidationError{Name: "hashed_passwd", err: errors.New(`ent: missing required field "Device.hashed_passwd"`)}
 	}
@@ -145,6 +154,10 @@ func (dc *DeviceCreate) createSpec() (*Device, *sqlgraph.CreateSpec) {
 	if value, ok := dc.mutation.BornAt(); ok {
 		_spec.SetField(device.FieldBornAt, field.TypeTime, value)
 		_node.BornAt = value
+	}
+	if value, ok := dc.mutation.Parent(); ok {
+		_spec.SetField(device.FieldParent, field.TypeString, value)
+		_node.Parent = value
 	}
 	if value, ok := dc.mutation.HashedPasswd(); ok {
 		_spec.SetField(device.FieldHashedPasswd, field.TypeString, value)

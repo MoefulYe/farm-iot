@@ -60,6 +60,11 @@ func BornAt(v time.Time) predicate.Device {
 	return predicate.Device(sql.FieldEQ(FieldBornAt, v))
 }
 
+// Parent applies equality check predicate on the "parent" field. It's identical to ParentEQ.
+func Parent(v string) predicate.Device {
+	return predicate.Device(sql.FieldEQ(FieldParent, v))
+}
+
 // HashedPasswd applies equality check predicate on the "hashed_passwd" field. It's identical to HashedPasswdEQ.
 func HashedPasswd(v string) predicate.Device {
 	return predicate.Device(sql.FieldEQ(FieldHashedPasswd, v))
@@ -113,6 +118,71 @@ func BornAtLT(v time.Time) predicate.Device {
 // BornAtLTE applies the LTE predicate on the "born_at" field.
 func BornAtLTE(v time.Time) predicate.Device {
 	return predicate.Device(sql.FieldLTE(FieldBornAt, v))
+}
+
+// ParentEQ applies the EQ predicate on the "parent" field.
+func ParentEQ(v string) predicate.Device {
+	return predicate.Device(sql.FieldEQ(FieldParent, v))
+}
+
+// ParentNEQ applies the NEQ predicate on the "parent" field.
+func ParentNEQ(v string) predicate.Device {
+	return predicate.Device(sql.FieldNEQ(FieldParent, v))
+}
+
+// ParentIn applies the In predicate on the "parent" field.
+func ParentIn(vs ...string) predicate.Device {
+	return predicate.Device(sql.FieldIn(FieldParent, vs...))
+}
+
+// ParentNotIn applies the NotIn predicate on the "parent" field.
+func ParentNotIn(vs ...string) predicate.Device {
+	return predicate.Device(sql.FieldNotIn(FieldParent, vs...))
+}
+
+// ParentGT applies the GT predicate on the "parent" field.
+func ParentGT(v string) predicate.Device {
+	return predicate.Device(sql.FieldGT(FieldParent, v))
+}
+
+// ParentGTE applies the GTE predicate on the "parent" field.
+func ParentGTE(v string) predicate.Device {
+	return predicate.Device(sql.FieldGTE(FieldParent, v))
+}
+
+// ParentLT applies the LT predicate on the "parent" field.
+func ParentLT(v string) predicate.Device {
+	return predicate.Device(sql.FieldLT(FieldParent, v))
+}
+
+// ParentLTE applies the LTE predicate on the "parent" field.
+func ParentLTE(v string) predicate.Device {
+	return predicate.Device(sql.FieldLTE(FieldParent, v))
+}
+
+// ParentContains applies the Contains predicate on the "parent" field.
+func ParentContains(v string) predicate.Device {
+	return predicate.Device(sql.FieldContains(FieldParent, v))
+}
+
+// ParentHasPrefix applies the HasPrefix predicate on the "parent" field.
+func ParentHasPrefix(v string) predicate.Device {
+	return predicate.Device(sql.FieldHasPrefix(FieldParent, v))
+}
+
+// ParentHasSuffix applies the HasSuffix predicate on the "parent" field.
+func ParentHasSuffix(v string) predicate.Device {
+	return predicate.Device(sql.FieldHasSuffix(FieldParent, v))
+}
+
+// ParentEqualFold applies the EqualFold predicate on the "parent" field.
+func ParentEqualFold(v string) predicate.Device {
+	return predicate.Device(sql.FieldEqualFold(FieldParent, v))
+}
+
+// ParentContainsFold applies the ContainsFold predicate on the "parent" field.
+func ParentContainsFold(v string) predicate.Device {
+	return predicate.Device(sql.FieldContainsFold(FieldParent, v))
 }
 
 // HashedPasswdEQ applies the EQ predicate on the "hashed_passwd" field.

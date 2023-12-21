@@ -13,6 +13,8 @@ const (
 	FieldID = "id"
 	// FieldBornAt holds the string denoting the born_at field in the database.
 	FieldBornAt = "born_at"
+	// FieldParent holds the string denoting the parent field in the database.
+	FieldParent = "parent"
 	// FieldHashedPasswd holds the string denoting the hashed_passwd field in the database.
 	FieldHashedPasswd = "hashed_passwd"
 	// FieldDeadAt holds the string denoting the dead_at field in the database.
@@ -27,6 +29,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldBornAt,
+	FieldParent,
 	FieldHashedPasswd,
 	FieldDeadAt,
 	FieldReason,
@@ -53,6 +56,11 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByBornAt orders the results by the born_at field.
 func ByBornAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldBornAt, opts...).ToFunc()
+}
+
+// ByParent orders the results by the parent field.
+func ByParent(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldParent, opts...).ToFunc()
 }
 
 // ByHashedPasswd orders the results by the hashed_passwd field.
