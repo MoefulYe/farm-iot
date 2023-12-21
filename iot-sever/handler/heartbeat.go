@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/MoefulYe/farm-iot/iot-server/protoc-gen/farm/cow"
+	"github.com/MoefulYe/farm-iot/iot-server/protoc-gen/farm/cow/heartbeat"
 	"github.com/MoefulYe/farm-iot/iot-server/stream"
 	"github.com/MoefulYe/farm-iot/iot-server/utils"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -10,8 +10,8 @@ import (
 	"time"
 )
 
-func KeepAliveMsgHandler(server mqtt.Client, msg mqtt.Message) {
-	keepAlive := new(cow.KeepAliveMsg)
+func HeartBeatHandler(server mqtt.Client, msg mqtt.Message) {
+	keepAlive := new(heartbeat.HeartBeat)
 	if err := proto.Unmarshal(msg.Payload(), keepAlive); err != nil {
 		return
 	}
@@ -24,7 +24,7 @@ func KeepAliveMsgHandler(server mqtt.Client, msg mqtt.Message) {
 	if err != nil {
 		return
 	}
-	data := &stream.KeepAlive{
+	data := &stream.HeartBeat{
 		Uuid:      id,
 		Timestamp: timestamp,
 		Weight:    keepAlive.GetWeight(),

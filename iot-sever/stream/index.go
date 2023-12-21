@@ -14,25 +14,23 @@ var (
 	sink   = make(chan any, 1024)
 )
 
-type KeepAlive struct {
+type HeartBeat struct {
 	Uuid      uuid.UUID
 	Timestamp time.Time
 	Weight    float64
 	Health    float64
-	Geo       struct {
-		Latitude  float64
-		Longitude float64
-	}
+	Latitude  float64
+	Longitude float64
 }
 
-func (k *KeepAlive) AsPoint() *write.Point {
+func (k *HeartBeat) AsPoint() *write.Point {
 	return write.NewPoint(
 		"cow", map[string]string{"uuid": k.Uuid.String()},
 		map[string]interface{}{
 			"weight":    k.Weight,
 			"health":    k.Health,
-			"latitude":  k.Geo.Latitude,
-			"longitude": k.Geo.Longitude,
+			"latitude":  k.Latitude,
+			"longitude": k.Longitude,
 		}, k.Timestamp,
 	)
 }
@@ -42,7 +40,7 @@ func init() {
 	go func() {
 		ext.NewChanSource(source).Via(
 			flow.NewMap(
-				func(k *KeepAlive) *write.Point {
+				func(k *HeartBeat) *write.Point {
 					return k.AsPoint()
 				}, 64,
 			),
