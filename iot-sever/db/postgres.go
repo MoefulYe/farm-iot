@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/MoefulYe/farm-iot/database/postgres/ent"
 	"github.com/MoefulYe/farm-iot/iot-server/config"
+	. "github.com/MoefulYe/farm-iot/iot-server/logger"
 	_ "github.com/lib/pq"
-	"log"
 )
 
 var (
@@ -15,11 +15,11 @@ var (
 func init() {
 	client, err := ent.Open("postgres", config.Conf.Postgres)
 	if err != nil {
-		log.Fatalf(err.Error())
+		Logger.Fatal(err.Error())
 	}
 	err = client.Schema.Create(context.Background())
 	if err != nil {
-		log.Fatalf(err.Error())
+		Logger.Fatal(err.Error())
 	}
 	PgClient = client
 }

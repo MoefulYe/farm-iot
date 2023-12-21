@@ -1,9 +1,9 @@
 package config
 
 import (
+	. "github.com/MoefulYe/farm-iot/iot-server/logger"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/spf13/viper"
-	"log"
 )
 
 type Config struct {
@@ -32,10 +32,10 @@ func init() {
 	viper.SetConfigType("toml")
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatalf(err.Error())
+		Logger.Fatal(err.Error())
 	}
 	err = viper.Unmarshal(&Conf)
 	if err != nil {
-		log.Fatalf(err.Error())
+		Logger.Fatal(err.Error())
 	}
 }

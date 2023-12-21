@@ -110,10 +110,13 @@ export default class Cow {
   }
 
   private listen() {
-    this.client.subscribeAsync(`cow/${this.state.uuid}/command/#`);
+    this.client.subscribeAsync([
+      `cow/${this.state.uuid}/command/+`,
+      "cow/any/command/+",
+    ]);
     const kill = `cow/${this.state.uuid}/command/kill`;
     const banish = `cow/${this.state.uuid}/command/banish`;
-    const cure = "cow/command/cure";
+    const cure = "cow/any/command/cure";
     this.client.on("message", (topic, _) => {
       switch (topic) {
         case kill:
@@ -231,7 +234,7 @@ export default class Cow {
       `cow-${this.state.uuid} longitude: ${this.state.longitude}, latitude: ${this.state.latitude}, weight: ${this.state.weight}, health: ${this.state.health}`
     );
     const pkt = encodeHeartBeat(heartBeat);
-    await this.client.publishAsync("cow/keep-alive", Buffer.from(pkt));
+    await this.client.publishAsync("cow/heartbeat", Buffer.from(pkt));
   }
 
   private mutate() {
