@@ -31,6 +31,7 @@ func init() {
 	viper.AddConfigPath("./")
 	viper.SetConfigName("conf")
 	viper.SetConfigType("toml")
+	Logger.Infow("read config")
 	err := viper.ReadInConfig()
 	if err != nil {
 		Logger.Fatal(err.Error())

@@ -35,4 +35,5 @@ func RegisterRouter() {
 	); token.Wait() && token.Error() != nil {
 		Logger.Fatal(token.Error().Error())
 	}
+	Logger.Infow("register mqtt topic handler")
 }

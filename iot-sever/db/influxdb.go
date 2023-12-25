@@ -19,4 +19,5 @@ func init() {
 			logger.Logger.Warnw(err.Error())
 		}
 	}()
+	logger.Logger.Infow("init influxdb connection")
 }

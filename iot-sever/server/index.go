@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/MoefulYe/farm-iot/iot-server/config"
+	"github.com/MoefulYe/farm-iot/iot-server/logger"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
 )
@@ -14,4 +15,5 @@ func init() {
 	if token := Server.Connect(); token.Wait() && token.Error() != nil {
 		log.Fatalf(token.Error().Error())
 	}
+	logger.Logger.Infow("init mqtt client")
 }

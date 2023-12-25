@@ -19,6 +19,7 @@ func init() {
 	go func() {
 		ext.NewChanSource(source).Via(flow.NewTumblingWindow(time.Minute * 5)).To(ext.NewChanSink(sink))
 	}()
+	logger.Logger.Infow("init data stream")
 }
 
 func Input() chan<- any {

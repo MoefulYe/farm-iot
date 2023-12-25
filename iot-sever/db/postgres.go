@@ -22,4 +22,5 @@ func init() {
 		Logger.Fatal(err.Error())
 	}
 	PgClient = client
+	Logger.Infow("init postgrsql connection")
 }

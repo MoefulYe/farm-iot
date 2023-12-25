@@ -12,21 +12,25 @@ import (
 import "context"
 
 var listener net.Listener
-var serv *grpc.Server
+var Serv *grpc.Server
 
 func init() {
+	if config.Conf.GrpcAddr == "" {
+		logger.Logger.Fatal("grpc addr is empty")
+	}
 	_listener, err := net.Listen("tcp", config.Conf.GrpcAddr)
 	if err != nil {
 		logger.Logger.Fatalw(err.Error())
 	}
 	listener = _listener
-	serv = grpc.NewServer()
-	service.RegisterServiceServer(serv, &grpcService{})
+	Serv = grpc.NewServer()
+	service.RegisterServiceServer(Serv, &grpcService{})
 	go func() {
-		if err = serv.Serve(listener); err != nil {
+		if err = Serv.Serve(listener); err != nil {
 			logger.Logger.Error(err.Error())
 		}
 	}()
+	logger.Logger.Infow("init grpc service")
 }
 
 type grpcService struct {
