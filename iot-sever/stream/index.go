@@ -1,9 +1,9 @@
 package stream
 
 import (
-	"github.com/MoefulYe/farm-iot/iot-server/db"
-	"github.com/google/uuid"
-	"github.com/influxdata/influxdb-client-go/v2/api/write"
+	"github.com/MoefulYe/farm-iot/iot-server/logger"
+	"github.com/MoefulYe/farm-iot/iot-server/protoc-gen/farm/cow/heartbeat"
+	"github.com/MoefulYe/farm-iot/iot-server/server"
 	ext "github.com/reugn/go-streams/extension"
 	"github.com/reugn/go-streams/flow"
 	"time"
@@ -14,37 +14,10 @@ var (
 	sink   = make(chan any, 1024)
 )
 
-type HeartBeat struct {
-	Uuid      uuid.UUID
-	Timestamp time.Time
-	Weight    float64
-	Health    float64
-	Latitude  float64
-	Longitude float64
-}
-
-func (k *HeartBeat) AsPoint() *write.Point {
-	return write.NewPoint(
-		"cow", map[string]string{"uuid": k.Uuid.String()},
-		map[string]interface{}{
-			"weight":    k.Weight,
-			"health":    k.Health,
-			"latitude":  k.Latitude,
-			"longitude": k.Longitude,
-		}, k.Timestamp,
-	)
-}
-
 func init() {
-	go sendToInfluxdb()
+	go handle()
 	go func() {
-		ext.NewChanSource(source).Via(
-			flow.NewMap(
-				func(k *HeartBeat) *write.Point {
-					return k.AsPoint()
-				}, 64,
-			),
-		).To(ext.NewChanSink(sink))
+		ext.NewChanSource(source).Via(flow.NewTumblingWindow(time.Minute * 5)).To(ext.NewChanSink(sink))
 	}()
 }
 
@@ -52,8 +25,26 @@ func Input() chan<- any {
 	return source
 }
 
-func sendToInfluxdb() {
-	for point := range sink {
-		db.InfluxWriteApi.WritePoint(point.(*write.Point))
+func handle() {
+	for window := range sink {
+		window := window.([]any)
+		cnt := len(window)
+		sum := 0.0
+		if cnt > 0 {
+			for _, elem := range window {
+				sum += elem.(*heartbeat.HeartBeat).Health
+			}
+			avg := sum / float64(cnt)
+			if avg < 0.5 {
+				if token := server.Server.Publish(
+					"cow/broadcast/command/cure",
+					0,
+					false,
+					[]byte{},
+				); token.Wait() && token.Error() != nil {
+					logger.Logger.Warnw(token.Error().Error())
+				}
+			}
+		}
 	}
 }

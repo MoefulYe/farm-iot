@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package grpc.service;
+option go_package = "grpc/service";
+
+message SpawnReq {}
+
+message SpawnResp {}
+
+
+message KillReq {
+  repeated string list = 1;
+}
+
+message KillResp {}
+
+service Service {
+  rpc spawn(SpawnReq) returns (SpawnResp);
+  rpc kill(KillReq) returns (KillResp);
+}

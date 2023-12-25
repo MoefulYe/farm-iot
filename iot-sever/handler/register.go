@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	. "github.com/MoefulYe/farm-iot/iot-server/ctx"
 	"github.com/MoefulYe/farm-iot/iot-server/db"
 	. "github.com/MoefulYe/farm-iot/iot-server/logger"
 	"github.com/MoefulYe/farm-iot/iot-server/protoc-gen/farm/cow/register"
@@ -41,7 +42,7 @@ func RegisterHandler(server mqtt.Client, msg mqtt.Message) {
 	parent := payload.GetParent()
 	query := db.PgClient.Device.Create().SetID(id).SetBornAt(bornAt).SetHashedPasswd(hashedPasswd)
 	if parent == "" {
-		if _, err = query.Save(ctx); err != nil {
+		if _, err = query.Save(Ctx); err != nil {
 			Logger.Warnw("register error: save device error", "error", err.Error())
 			handleRegisterResult(server, payload.GetUuid(), register.Status_STATUS_FAILED, "")
 			return
@@ -50,8 +51,10 @@ func RegisterHandler(server mqtt.Client, msg mqtt.Message) {
 		parent, err := uuid.Parse(parent)
 		if err != nil {
 			Logger.Warnw("register error: parse parent error", "error", err.Error())
+			handleRegisterResult(server, payload.GetUuid(), register.Status_STATUS_FAILED, "")
+			return
 		}
-		if _, err = query.SetParentID(parent).Save(ctx); err != nil {
+		if _, err = query.SetParentID(parent).Save(Ctx); err != nil {
 			Logger.Warnw("register error: save device error", "error", err.Error())
 			handleRegisterResult(server, payload.GetUuid(), register.Status_STATUS_FAILED, "")
 			return
@@ -60,18 +63,13 @@ func RegisterHandler(server mqtt.Client, msg mqtt.Message) {
 	claims := utils.NewClaims(payload.GetUuid())
 	token, err := utils.JWTGenerate(claims)
 	if err != nil {
+		Logger.Warnw("register error: fail to gen token")
 		handleRegisterResult(
-			server, payload.GetUuid(), cow.RegisterResp_FAILED, "",
+			server, payload.GetUuid(), register.Status_STATUS_FAILED, "",
 		)
 		return
 	}
-	if err != nil {
-		handleRegisterResult(
-			server, payload.GetUuid(), cow.RegisterResp_FAILED, "",
-		)
-		return
-	}
-	handleRegisterResult(server, payload.GetUuid(), cow.RegisterResp_OK, token)
+	handleRegisterResult(server, payload.GetUuid(), register.Status_STATUS_OK, token)
 }
 
 func handleRegisterResult(

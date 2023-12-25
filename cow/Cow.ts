@@ -39,7 +39,7 @@ export interface State {
 export const fix = (val: number, [minBound, maxBound]: [number, number]) =>
   Math.max(minBound, Math.min(maxBound, val));
 export default class Cow {
-  private static readonly INIT_HP = 25;
+  private static readonly INIT_HP = 15;
   private static readonly INIT_WEIGHT = 5;
   private static readonly INIT_HEALTH = 1;
 
@@ -112,11 +112,11 @@ export default class Cow {
   private listen() {
     this.client.subscribeAsync([
       `cow/${this.state.uuid}/command/+`,
-      "cow/any/command/+",
+      "cow/broadcast/command/+",
     ]);
     const kill = `cow/${this.state.uuid}/command/kill`;
     const banish = `cow/${this.state.uuid}/command/banish`;
-    const cure = "cow/any/command/cure";
+    const cure = "cow/broadcast/command/cure";
     this.client.on("message", (topic, _) => {
       switch (topic) {
         case kill:
@@ -218,7 +218,7 @@ export default class Cow {
   }
 
   private cure(): void {
-    this.state.health = fix(this.state.health + Math.random() * 0.08, [0, 1]);
+    this.state.health = fix(this.state.health + Math.random() * 0.2, [0, 1]);
   }
 
   private async heartBeat(): Promise<void> {
@@ -231,7 +231,7 @@ export default class Cow {
       health: this.state.health,
     };
     logger.debug(
-      `cow-${this.state.uuid} longitude: ${this.state.longitude}, latitude: ${this.state.latitude}, weight: ${this.state.weight}, health: ${this.state.health}`
+      `cow-${this.state.uuid} longitude: ${this.state.longitude}, latitude: ${this.state.latitude}, weight: ${this.state.weight}, health: ${this.state.health}, hp: ${this.state.healthPoint}`
     );
     const pkt = encodeHeartBeat(heartBeat);
     await this.client.publishAsync("cow/heartbeat", Buffer.from(pkt));
@@ -245,10 +245,10 @@ export default class Cow {
 
   private mutateHealth() {
     this.state.health = fix(
-      this.state.health + (Math.random() - 0.6) * 0.05,
+      this.state.health + (Math.random() - 0.8) * 0.05,
       [0, 1]
     );
-    this.state.healthPoint -= this.state.health - 1;
+    this.state.healthPoint -= 1 - this.state.health;
   }
 
   private mutateLocation() {
@@ -259,7 +259,7 @@ export default class Cow {
   }
 
   private mutateWeight() {
-    this.state.weight += 5 * (this.state.health - 0.3);
+    this.state.weight += 10 * (this.state.health - 0.2);
   }
 
   private async banish() {

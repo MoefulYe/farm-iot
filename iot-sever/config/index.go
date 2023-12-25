@@ -11,6 +11,7 @@ type Config struct {
 	User     string `toml:"user"`
 	Passwd   string `toml:"passwd"`
 	Postgres string `toml:"postgres"`
+	GrpcAddr string `toml:"grpc_addr"`
 	Influxdb struct {
 		Url      string `toml:"url"`
 		Auth     string `toml:"auth"`
@@ -21,7 +22,7 @@ type Config struct {
 
 func (c *Config) NewServerOpts() *mqtt.ClientOptions {
 	return mqtt.NewClientOptions().AddBroker(c.Broker).SetUsername(c.User).
-		SetPassword(c.Passwd)
+		SetPassword(c.Passwd).SetClientID("iot-server")
 }
 
 var Conf Config

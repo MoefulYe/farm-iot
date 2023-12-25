@@ -9,7 +9,7 @@ var jwtSecret = []byte("hby5jynllqzqms3d")
 
 func NewClaims(uuid string) jwt.StandardClaims {
 	return jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(time.Hour * 24 * 30).Unix(),
+		ExpiresAt: time.Now().Add(time.Hour * 24 * 30 * 6).Unix(),
 		Id:        uuid,
 	}
 }
