@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	. "github.com/MoefulYe/farm-iot/iot-server/ctx"
 	"github.com/MoefulYe/farm-iot/iot-server/db"
 	"github.com/MoefulYe/farm-iot/iot-server/logger"
@@ -29,10 +28,8 @@ func DieHandler(_ mqtt.Client, msg mqtt.Message) {
 
 	if die.Reason == "kill" {
 		money := die.Weight * 30.0
-		reason := fmt.Sprintf("kill cow-%s and get %v", die.Uuid, money)
 		point := write.NewPoint(
 			"balance", map[string]string{}, map[string]interface{}{
-				"reason":  reason,
 				"balance": money,
 			}, ts,
 		)

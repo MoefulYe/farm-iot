@@ -37,7 +37,6 @@ func handle() {
 			feedOutcome := -5.0 * cnt
 			feed := write.NewPoint(
 				"balance", map[string]string{}, map[string]interface{}{
-					"reason":  "feed",
 					"balance": feedOutcome,
 				}, time.Now(),
 			)
@@ -50,7 +49,6 @@ func handle() {
 				cureOutcome := -50.0 * cnt
 				cure := write.NewPoint(
 					"balance", map[string]string{}, map[string]interface{}{
-						"reason":  "cure",
 						"balance": cureOutcome,
 					}, time.Now(),
 				)
