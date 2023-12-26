@@ -1,7 +1,7 @@
 package constant
 
 const LongitudeMin = 120.35
-const LongitudeMax = 120.35
+const LongitudeMax = 120.37
 const LatitudeMin = 30.29
 const LatitudeMax = 30.31
 
