@@ -1,9 +1,11 @@
 package stream
 
 import (
+	"github.com/MoefulYe/farm-iot/iot-server/db"
 	"github.com/MoefulYe/farm-iot/iot-server/logger"
 	"github.com/MoefulYe/farm-iot/iot-server/protoc-gen/farm/cow/heartbeat"
 	"github.com/MoefulYe/farm-iot/iot-server/server"
+	"github.com/influxdata/influxdb-client-go/v2/api/write"
 	ext "github.com/reugn/go-streams/extension"
 	"github.com/reugn/go-streams/flow"
 	"time"
@@ -32,11 +34,27 @@ func handle() {
 		cnt := len(window)
 		sum := 0.0
 		if cnt > 0 {
+			feedOutcome := -5.0 * cnt
+			feed := write.NewPoint(
+				"balance", map[string]string{}, map[string]interface{}{
+					"reason":  "feed",
+					"balance": feedOutcome,
+				}, time.Now(),
+			)
+			db.InfluxWriteApi.WritePoint(feed)
 			for _, elem := range window {
 				sum += elem.(*heartbeat.HeartBeat).Health
 			}
-			avg := sum / float64(cnt)
-			if avg < 0.5 {
+			health := sum / float64(cnt)
+			if health < 0.5 {
+				cureOutcome := -50.0 * cnt
+				cure := write.NewPoint(
+					"balance", map[string]string{}, map[string]interface{}{
+						"reason":  "cure",
+						"balance": cureOutcome,
+					}, time.Now(),
+				)
+				db.InfluxWriteApi.WritePoint(cure)
 				if token := server.Server.Publish(
 					"cow/broadcast/command/cure",
 					0,

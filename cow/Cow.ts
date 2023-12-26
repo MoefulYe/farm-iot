@@ -218,7 +218,7 @@ export default class Cow {
   }
 
   private cure(): void {
-    this.state.health = fix(this.state.health + Math.random() * 0.2, [0, 1]);
+    this.state.health = Math.min(this.state.health + 0.2, 1);
   }
 
   private async heartBeat(): Promise<void> {
