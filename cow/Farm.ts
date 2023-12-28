@@ -4,13 +4,13 @@ import { EQMX_PASSWORD, EQMX_URL, EQMX_USERNAME, FARM } from "./constants";
 import logger from "./logger";
 
 export default class Farm {
-  private static readonly BUTCH_INTERVAL = 1050 * 59 * 29;
+  private static readonly BUTCH_INTERVAL = 1234 * 46 * 23;
   private cows: Cow[];
   private client: MqttClient;
   private constructor(cows: Cow[]) {
     this.cows = cows;
     this.client = connect(EQMX_URL, {
-      clientId: "manager",
+      clientId: "farm",
       clean: true,
       connectTimeout: 4000,
       username: EQMX_USERNAME,
@@ -42,7 +42,7 @@ export default class Farm {
   }
 
   private listen() {
-    this.client.subscribe(["farm/spawn", "farm/butch"]);
+    this.client.subscribe("farm/spawn");
     this.client.on("message", async (topic) => {
       switch (topic) {
         case "farm/spawn":
@@ -73,9 +73,9 @@ export default class Farm {
 
   public activate() {
     this.listen();
+    this.butch();
     setInterval(() => this.butch(), Farm.BUTCH_INTERVAL);
     this.cows.forEach((cow) => cow.activate());
-    this.butch();
   }
 
   private butch() {
@@ -86,18 +86,18 @@ export default class Farm {
       logger.info(`cows num is ${num} and less than 100, no cow is killed`);
     } else if (num < 200) {
       logger.info(`cows num is ${num} and less than 200, 10 cows are killed`);
-      this.cows.splice(num - 10, 10).forEach((cow) => cow.kill());
+      this.cows.splice(num - 10, 10).forEach((cow) => cow.butch());
     } else if (num < 300) {
       logger.info(`cows num is ${num} and less than 300, 20 cows are killed`);
-      this.cows.splice(num - 20, 20).forEach((cow) => cow.kill());
+      this.cows.splice(num - 20, 20).forEach((cow) => cow.butch());
     } else if (num < 400) {
       logger.info(`cows num is ${num} and less than 400, 30 cows are killed`);
-      this.cows.splice(num - 30, 30).forEach((cow) => cow.kill());
+      this.cows.splice(num - 30, 30).forEach((cow) => cow.butch());
     } else {
       logger.info(
         `cows num is ${num} and more than 400, ${num - 300} cows are killed`
       );
-      this.cows.splice(300, num - 300).forEach((cow) => cow.kill());
+      this.cows.splice(300, num - 300).forEach((cow) => cow.butch());
     }
   }
 }

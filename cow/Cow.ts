@@ -326,6 +326,23 @@ export default class Cow {
     logger.info(`cow-${this.state.uuid} is killed`);
   }
 
+  public async butch() {
+    const msg = encodeDie({
+      timestamp: new Date().toISOString(),
+      reason: "kill",
+      uuid: this.state.uuid,
+      token: this.state.token,
+      weight: this.state.weight,
+      health: this.state.health,
+      latitude: this.state.latitude,
+      longitude: this.state.longitude,
+    });
+    await this.client.publishAsync("cow/die", Buffer.from(msg));
+    this.client.end();
+    clearInterval(this.timeOut);
+    logger.info(`cow-${this.state.uuid} is killed`);
+  }
+
   private async run(): Promise<void> {
     this.mutate();
     if (this.isDead()) {
