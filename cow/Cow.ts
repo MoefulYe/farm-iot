@@ -22,6 +22,7 @@ import {
 import { encodeHeartBeat } from "./protoc/heartbeat";
 import { encodeDie } from "./protoc/command";
 import { farm } from "./Farm";
+import dayjs from "dayjs";
 
 export interface State {
   born_at: string;
@@ -64,7 +65,7 @@ export default class Cow {
 
   public static async newCow(): Promise<Cow> {
     const cow = new Cow({
-      born_at: new Date().toISOString(),
+      born_at: dayjs().format(),
       uuid: v4(),
       longitude: LONGITUDE_CENTER,
       latitude: LATITUDE_CENTER,
@@ -82,7 +83,7 @@ export default class Cow {
 
   private async breed(): Promise<Cow> {
     const cow = new Cow({
-      born_at: new Date().toISOString(),
+      born_at: dayjs().format(),
       uuid: v4(),
       longitude: this.state.longitude,
       latitude: this.state.latitude,
@@ -223,7 +224,7 @@ export default class Cow {
 
   private async heartBeat(): Promise<void> {
     const heartBeat = {
-      timestamp: new Date().toISOString(),
+      timestamp: dayjs().format(),
       token: this.state.token,
       longitude: this.state.longitude,
       latitude: this.state.latitude,
@@ -280,7 +281,7 @@ export default class Cow {
 
   private async ill() {
     const msg = encodeDie({
-      timestamp: new Date().toISOString(),
+      timestamp: dayjs().format(),
       reason: "ill",
       uuid: this.state.uuid,
       token: this.state.token,
@@ -310,7 +311,7 @@ export default class Cow {
 
   public async kill() {
     const msg = encodeDie({
-      timestamp: new Date().toISOString(),
+      timestamp: dayjs().format(),
       reason: "kill",
       uuid: this.state.uuid,
       token: this.state.token,
@@ -328,7 +329,7 @@ export default class Cow {
 
   public async butch() {
     const msg = encodeDie({
-      timestamp: new Date().toISOString(),
+      timestamp: dayjs().format(),
       reason: "kill",
       uuid: this.state.uuid,
       token: this.state.token,

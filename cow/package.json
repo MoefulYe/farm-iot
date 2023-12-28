@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@types/uuid": "^9.0.7",
+    "dayjs": "^1.11.10",
     "mqtt": "^5.3.3",
     "uuid": "^9.0.1",
     "winston": "^3.11.0"
