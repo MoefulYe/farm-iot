@@ -1,11 +1,11 @@
 package db
 
 import (
-	"github.com/MoefulYe/farm-iot/database/postgres/ent"
 	"github.com/MoefulYe/farm-iot/iot-server/config"
 	. "github.com/MoefulYe/farm-iot/iot-server/ctx"
 	. "github.com/MoefulYe/farm-iot/iot-server/logger"
 	_ "github.com/lib/pq"
+	"pg/ent"
 )
 
 var (

@@ -9,8 +9,8 @@ import (
 	"github.com/MoefulYe/farm-iot/iot-server/stream"
 	"github.com/MoefulYe/farm-iot/iot-server/utils"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/golang/protobuf/proto"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
+	"google.golang.org/protobuf/proto"
 	"time"
 )
 

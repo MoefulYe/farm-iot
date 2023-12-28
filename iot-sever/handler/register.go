@@ -8,8 +8,8 @@ import (
 	"github.com/MoefulYe/farm-iot/iot-server/protoc-gen/farm/cow/register"
 	"github.com/MoefulYe/farm-iot/iot-server/utils"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/golang/protobuf/proto"
 	"github.com/google/uuid"
+	"google.golang.org/protobuf/proto"
 	"time"
 )
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "github.com/MoefulYe/farm-iot/iot-server/butcher"
 	_ "github.com/MoefulYe/farm-iot/iot-server/grpc"
 	"github.com/MoefulYe/farm-iot/iot-server/router"
 	. "github.com/MoefulYe/farm-iot/iot-server/server"
@@ -19,4 +20,5 @@ func main() {
 	<-done
 	close(signal)
 	close(done)
+	os.Exit(0)
 }

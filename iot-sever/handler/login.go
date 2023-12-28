@@ -2,15 +2,15 @@ package handler
 
 import (
 	"fmt"
-	"github.com/MoefulYe/farm-iot/database/postgres/ent/device"
 	. "github.com/MoefulYe/farm-iot/iot-server/ctx"
 	"github.com/MoefulYe/farm-iot/iot-server/db"
 	. "github.com/MoefulYe/farm-iot/iot-server/logger"
 	"github.com/MoefulYe/farm-iot/iot-server/protoc-gen/farm/cow/login"
 	"github.com/MoefulYe/farm-iot/iot-server/utils"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/golang/protobuf/proto"
 	"github.com/google/uuid"
+	"google.golang.org/protobuf/proto"
+	"pg/ent/device"
 )
 
 func LoginHandler(server mqtt.Client, msg mqtt.Message) {

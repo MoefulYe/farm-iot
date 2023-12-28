@@ -1,9 +1,10 @@
-module github.com/MoefulYe/farm-iot/database/postgres
+module pg
 
 go 1.21.2
 
 require (
 	entgo.io/ent v0.12.4
+	github.com/MoefulYe/farm-iot/database/postgres v0.0.0-20231228040043-63b8f21c36e6
 	github.com/google/uuid v1.3.0
 )
 

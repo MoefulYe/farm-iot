@@ -6,9 +6,9 @@ import (
 	"github.com/MoefulYe/farm-iot/iot-server/logger"
 	"github.com/MoefulYe/farm-iot/iot-server/protoc-gen/farm/cow/command"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/golang/protobuf/proto"
 	"github.com/google/uuid"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
+	"google.golang.org/protobuf/proto"
 	"time"
 )
 
