@@ -21,6 +21,7 @@ import {
 } from "./protoc/register";
 import { encodeHeartBeat } from "./protoc/heartbeat";
 import { encodeDie } from "./protoc/command";
+import { farm } from "./Farm";
 
 export interface State {
   born_at: string;
@@ -184,7 +185,6 @@ export default class Cow {
     });
     await this.client.subscribeAsync(reply);
     await this.client.publishAsync("cow/register", Buffer.from(req));
-
     this.state.token = await new Promise<string>((resolve, reject) => {
       const event = this.client.on("message", (topic, payload) => {
         event.removeAllListeners("message");
@@ -292,6 +292,7 @@ export default class Cow {
     await this.client.publishAsync("cow/die", Buffer.from(msg));
     this.client.end();
     clearInterval(this.timeOut);
+    farm.logout(this.state.uuid);
     logger.info(`cow-${this.state.uuid} is died`);
   }
 
@@ -307,7 +308,7 @@ export default class Cow {
     );
   }
 
-  private async kill() {
+  public async kill() {
     const msg = encodeDie({
       timestamp: new Date().toISOString(),
       reason: "kill",
@@ -321,34 +322,26 @@ export default class Cow {
     await this.client.publishAsync("cow/die", Buffer.from(msg));
     this.client.end();
     clearInterval(this.timeOut);
+    farm.logout(this.state.uuid);
     logger.info(`cow-${this.state.uuid} is killed`);
   }
 
-  private async run(
-    onDie: (uuid: string) => void,
-    onBreed: (child: Cow) => void
-  ): Promise<void> {
+  private async run(): Promise<void> {
     this.mutate();
     if (this.isDead()) {
       await this.ill();
-      onDie(this.state.uuid);
       return;
     }
     await this.heartBeat();
     if (this.breedable()) {
-      onBreed(await this.breed());
+      const child = await this.breed();
+      farm.register(child);
     }
   }
 
-  public async activate(
-    onDie: (uuid: string) => void,
-    onBreed: (child: Cow) => void
-  ): Promise<void> {
+  public async activate(): Promise<void> {
     this.listen();
-    this.timeOut = setInterval(
-      () => this.run(onDie, onBreed),
-      HEARTBEAT_INTERVAL
-    );
+    this.timeOut = setInterval(() => this.run(), HEARTBEAT_INTERVAL);
     logger.info(`activate cow-${this.state.uuid}`);
   }
 }
