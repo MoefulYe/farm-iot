@@ -19,8 +19,10 @@ type Balance struct {
 	ID int `json:"id,omitempty"`
 	// When holds the value of the "when" field.
 	When time.Time `json:"when,omitempty"`
-	// Balance holds the value of the "balance" field.
-	Balance      float64 `json:"balance,omitempty"`
+	// In holds the value of the "in" field.
+	In float64 `json:"in,omitempty"`
+	// Out holds the value of the "out" field.
+	Out          float64 `json:"out,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -29,7 +31,7 @@ func (*Balance) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case balance.FieldBalance:
+		case balance.FieldIn, balance.FieldOut:
 			values[i] = new(sql.NullFloat64)
 		case balance.FieldID:
 			values[i] = new(sql.NullInt64)
@@ -62,11 +64,17 @@ func (b *Balance) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				b.When = value.Time
 			}
-		case balance.FieldBalance:
+		case balance.FieldIn:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field balance", values[i])
+				return fmt.Errorf("unexpected type %T for field in", values[i])
 			} else if value.Valid {
-				b.Balance = value.Float64
+				b.In = value.Float64
+			}
+		case balance.FieldOut:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field out", values[i])
+			} else if value.Valid {
+				b.Out = value.Float64
 			}
 		default:
 			b.selectValues.Set(columns[i], values[i])
@@ -107,8 +115,11 @@ func (b *Balance) String() string {
 	builder.WriteString("when=")
 	builder.WriteString(b.When.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("balance=")
-	builder.WriteString(fmt.Sprintf("%v", b.Balance))
+	builder.WriteString("in=")
+	builder.WriteString(fmt.Sprintf("%v", b.In))
+	builder.WriteString(", ")
+	builder.WriteString("out=")
+	builder.WriteString(fmt.Sprintf("%v", b.Out))
 	builder.WriteByte(')')
 	return builder.String()
 }

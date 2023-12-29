@@ -12,7 +12,8 @@ var (
 	BalancesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "when", Type: field.TypeTime},
-		{Name: "balance", Type: field.TypeFloat64},
+		{Name: "in", Type: field.TypeFloat64},
+		{Name: "out", Type: field.TypeFloat64},
 	}
 	// BalancesTable holds the schema information for the "balances" table.
 	BalancesTable = &schema.Table{

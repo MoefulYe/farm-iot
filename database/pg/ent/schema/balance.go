@@ -15,7 +15,8 @@ type Balance struct {
 func (Balance) Fields() []ent.Field {
 	return []ent.Field{
 		field.Time("when").Immutable().Default(time.Now),
-		field.Float("balance").Immutable(),
+		field.Float("in").Immutable(),
+		field.Float("out").Immutable(),
 	}
 }
 

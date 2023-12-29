@@ -34,9 +34,15 @@ func (bc *BalanceCreate) SetNillableWhen(t *time.Time) *BalanceCreate {
 	return bc
 }
 
-// SetBalance sets the "balance" field.
-func (bc *BalanceCreate) SetBalance(f float64) *BalanceCreate {
-	bc.mutation.SetBalance(f)
+// SetIn sets the "in" field.
+func (bc *BalanceCreate) SetIn(f float64) *BalanceCreate {
+	bc.mutation.SetIn(f)
+	return bc
+}
+
+// SetOut sets the "out" field.
+func (bc *BalanceCreate) SetOut(f float64) *BalanceCreate {
+	bc.mutation.SetOut(f)
 	return bc
 }
 
@@ -86,8 +92,11 @@ func (bc *BalanceCreate) check() error {
 	if _, ok := bc.mutation.When(); !ok {
 		return &ValidationError{Name: "when", err: errors.New(`ent: missing required field "Balance.when"`)}
 	}
-	if _, ok := bc.mutation.Balance(); !ok {
-		return &ValidationError{Name: "balance", err: errors.New(`ent: missing required field "Balance.balance"`)}
+	if _, ok := bc.mutation.In(); !ok {
+		return &ValidationError{Name: "in", err: errors.New(`ent: missing required field "Balance.in"`)}
+	}
+	if _, ok := bc.mutation.Out(); !ok {
+		return &ValidationError{Name: "out", err: errors.New(`ent: missing required field "Balance.out"`)}
 	}
 	return nil
 }
@@ -119,9 +128,13 @@ func (bc *BalanceCreate) createSpec() (*Balance, *sqlgraph.CreateSpec) {
 		_spec.SetField(balance.FieldWhen, field.TypeTime, value)
 		_node.When = value
 	}
-	if value, ok := bc.mutation.Balance(); ok {
-		_spec.SetField(balance.FieldBalance, field.TypeFloat64, value)
-		_node.Balance = value
+	if value, ok := bc.mutation.In(); ok {
+		_spec.SetField(balance.FieldIn, field.TypeFloat64, value)
+		_node.In = value
+	}
+	if value, ok := bc.mutation.Out(); ok {
+		_spec.SetField(balance.FieldOut, field.TypeFloat64, value)
+		_node.Out = value
 	}
 	return _node, _spec
 }

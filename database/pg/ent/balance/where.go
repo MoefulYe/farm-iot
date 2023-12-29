@@ -59,9 +59,14 @@ func When(v time.Time) predicate.Balance {
 	return predicate.Balance(sql.FieldEQ(FieldWhen, v))
 }
 
-// Balance applies equality check predicate on the "balance" field. It's identical to BalanceEQ.
-func Balance(v float64) predicate.Balance {
-	return predicate.Balance(sql.FieldEQ(FieldBalance, v))
+// In applies equality check predicate on the "in" field. It's identical to InEQ.
+func In(v float64) predicate.Balance {
+	return predicate.Balance(sql.FieldEQ(FieldIn, v))
+}
+
+// Out applies equality check predicate on the "out" field. It's identical to OutEQ.
+func Out(v float64) predicate.Balance {
+	return predicate.Balance(sql.FieldEQ(FieldOut, v))
 }
 
 // WhenEQ applies the EQ predicate on the "when" field.
@@ -104,44 +109,84 @@ func WhenLTE(v time.Time) predicate.Balance {
 	return predicate.Balance(sql.FieldLTE(FieldWhen, v))
 }
 
-// BalanceEQ applies the EQ predicate on the "balance" field.
-func BalanceEQ(v float64) predicate.Balance {
-	return predicate.Balance(sql.FieldEQ(FieldBalance, v))
+// InEQ applies the EQ predicate on the "in" field.
+func InEQ(v float64) predicate.Balance {
+	return predicate.Balance(sql.FieldEQ(FieldIn, v))
 }
 
-// BalanceNEQ applies the NEQ predicate on the "balance" field.
-func BalanceNEQ(v float64) predicate.Balance {
-	return predicate.Balance(sql.FieldNEQ(FieldBalance, v))
+// InNEQ applies the NEQ predicate on the "in" field.
+func InNEQ(v float64) predicate.Balance {
+	return predicate.Balance(sql.FieldNEQ(FieldIn, v))
 }
 
-// BalanceIn applies the In predicate on the "balance" field.
-func BalanceIn(vs ...float64) predicate.Balance {
-	return predicate.Balance(sql.FieldIn(FieldBalance, vs...))
+// InIn applies the In predicate on the "in" field.
+func InIn(vs ...float64) predicate.Balance {
+	return predicate.Balance(sql.FieldIn(FieldIn, vs...))
 }
 
-// BalanceNotIn applies the NotIn predicate on the "balance" field.
-func BalanceNotIn(vs ...float64) predicate.Balance {
-	return predicate.Balance(sql.FieldNotIn(FieldBalance, vs...))
+// InNotIn applies the NotIn predicate on the "in" field.
+func InNotIn(vs ...float64) predicate.Balance {
+	return predicate.Balance(sql.FieldNotIn(FieldIn, vs...))
 }
 
-// BalanceGT applies the GT predicate on the "balance" field.
-func BalanceGT(v float64) predicate.Balance {
-	return predicate.Balance(sql.FieldGT(FieldBalance, v))
+// InGT applies the GT predicate on the "in" field.
+func InGT(v float64) predicate.Balance {
+	return predicate.Balance(sql.FieldGT(FieldIn, v))
 }
 
-// BalanceGTE applies the GTE predicate on the "balance" field.
-func BalanceGTE(v float64) predicate.Balance {
-	return predicate.Balance(sql.FieldGTE(FieldBalance, v))
+// InGTE applies the GTE predicate on the "in" field.
+func InGTE(v float64) predicate.Balance {
+	return predicate.Balance(sql.FieldGTE(FieldIn, v))
 }
 
-// BalanceLT applies the LT predicate on the "balance" field.
-func BalanceLT(v float64) predicate.Balance {
-	return predicate.Balance(sql.FieldLT(FieldBalance, v))
+// InLT applies the LT predicate on the "in" field.
+func InLT(v float64) predicate.Balance {
+	return predicate.Balance(sql.FieldLT(FieldIn, v))
 }
 
-// BalanceLTE applies the LTE predicate on the "balance" field.
-func BalanceLTE(v float64) predicate.Balance {
-	return predicate.Balance(sql.FieldLTE(FieldBalance, v))
+// InLTE applies the LTE predicate on the "in" field.
+func InLTE(v float64) predicate.Balance {
+	return predicate.Balance(sql.FieldLTE(FieldIn, v))
+}
+
+// OutEQ applies the EQ predicate on the "out" field.
+func OutEQ(v float64) predicate.Balance {
+	return predicate.Balance(sql.FieldEQ(FieldOut, v))
+}
+
+// OutNEQ applies the NEQ predicate on the "out" field.
+func OutNEQ(v float64) predicate.Balance {
+	return predicate.Balance(sql.FieldNEQ(FieldOut, v))
+}
+
+// OutIn applies the In predicate on the "out" field.
+func OutIn(vs ...float64) predicate.Balance {
+	return predicate.Balance(sql.FieldIn(FieldOut, vs...))
+}
+
+// OutNotIn applies the NotIn predicate on the "out" field.
+func OutNotIn(vs ...float64) predicate.Balance {
+	return predicate.Balance(sql.FieldNotIn(FieldOut, vs...))
+}
+
+// OutGT applies the GT predicate on the "out" field.
+func OutGT(v float64) predicate.Balance {
+	return predicate.Balance(sql.FieldGT(FieldOut, v))
+}
+
+// OutGTE applies the GTE predicate on the "out" field.
+func OutGTE(v float64) predicate.Balance {
+	return predicate.Balance(sql.FieldGTE(FieldOut, v))
+}
+
+// OutLT applies the LT predicate on the "out" field.
+func OutLT(v float64) predicate.Balance {
+	return predicate.Balance(sql.FieldLT(FieldOut, v))
+}
+
+// OutLTE applies the LTE predicate on the "out" field.
+func OutLTE(v float64) predicate.Balance {
+	return predicate.Balance(sql.FieldLTE(FieldOut, v))
 }
 
 // And groups predicates with the AND operator between them.

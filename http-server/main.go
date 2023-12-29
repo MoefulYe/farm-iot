@@ -26,6 +26,7 @@ func main() {
 		cowApi.GET(":uuid", handler.GetCowInfoByUuid)
 		cowApi.GET("", handler.GetCowInfo)
 	}
+	r.GET("/api/balance", middleware.Jwt(), handler.GetBalance)
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	if err := r.Run(":8080"); err != nil {
 		logger.Logger.Fatalw(err.Error())

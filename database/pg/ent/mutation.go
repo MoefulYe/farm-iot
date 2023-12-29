@@ -39,8 +39,10 @@ type BalanceMutation struct {
 	typ           string
 	id            *int
 	when          *time.Time
-	balance       *float64
-	addbalance    *float64
+	in            *float64
+	addin         *float64
+	out           *float64
+	addout        *float64
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Balance, error)
@@ -181,60 +183,116 @@ func (m *BalanceMutation) ResetWhen() {
 	m.when = nil
 }
 
-// SetBalance sets the "balance" field.
-func (m *BalanceMutation) SetBalance(f float64) {
-	m.balance = &f
-	m.addbalance = nil
+// SetIn sets the "in" field.
+func (m *BalanceMutation) SetIn(f float64) {
+	m.in = &f
+	m.addin = nil
 }
 
-// Balance returns the value of the "balance" field in the mutation.
-func (m *BalanceMutation) Balance() (r float64, exists bool) {
-	v := m.balance
+// In returns the value of the "in" field in the mutation.
+func (m *BalanceMutation) In() (r float64, exists bool) {
+	v := m.in
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldBalance returns the old "balance" field's value of the Balance entity.
+// OldIn returns the old "in" field's value of the Balance entity.
 // If the Balance object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BalanceMutation) OldBalance(ctx context.Context) (v float64, err error) {
+func (m *BalanceMutation) OldIn(ctx context.Context) (v float64, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldBalance is only allowed on UpdateOne operations")
+		return v, errors.New("OldIn is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldBalance requires an ID field in the mutation")
+		return v, errors.New("OldIn requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldBalance: %w", err)
+		return v, fmt.Errorf("querying old value for OldIn: %w", err)
 	}
-	return oldValue.Balance, nil
+	return oldValue.In, nil
 }
 
-// AddBalance adds f to the "balance" field.
-func (m *BalanceMutation) AddBalance(f float64) {
-	if m.addbalance != nil {
-		*m.addbalance += f
+// AddIn adds f to the "in" field.
+func (m *BalanceMutation) AddIn(f float64) {
+	if m.addin != nil {
+		*m.addin += f
 	} else {
-		m.addbalance = &f
+		m.addin = &f
 	}
 }
 
-// AddedBalance returns the value that was added to the "balance" field in this mutation.
-func (m *BalanceMutation) AddedBalance() (r float64, exists bool) {
-	v := m.addbalance
+// AddedIn returns the value that was added to the "in" field in this mutation.
+func (m *BalanceMutation) AddedIn() (r float64, exists bool) {
+	v := m.addin
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetBalance resets all changes to the "balance" field.
-func (m *BalanceMutation) ResetBalance() {
-	m.balance = nil
-	m.addbalance = nil
+// ResetIn resets all changes to the "in" field.
+func (m *BalanceMutation) ResetIn() {
+	m.in = nil
+	m.addin = nil
+}
+
+// SetOut sets the "out" field.
+func (m *BalanceMutation) SetOut(f float64) {
+	m.out = &f
+	m.addout = nil
+}
+
+// Out returns the value of the "out" field in the mutation.
+func (m *BalanceMutation) Out() (r float64, exists bool) {
+	v := m.out
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOut returns the old "out" field's value of the Balance entity.
+// If the Balance object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BalanceMutation) OldOut(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOut is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOut requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOut: %w", err)
+	}
+	return oldValue.Out, nil
+}
+
+// AddOut adds f to the "out" field.
+func (m *BalanceMutation) AddOut(f float64) {
+	if m.addout != nil {
+		*m.addout += f
+	} else {
+		m.addout = &f
+	}
+}
+
+// AddedOut returns the value that was added to the "out" field in this mutation.
+func (m *BalanceMutation) AddedOut() (r float64, exists bool) {
+	v := m.addout
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetOut resets all changes to the "out" field.
+func (m *BalanceMutation) ResetOut() {
+	m.out = nil
+	m.addout = nil
 }
 
 // Where appends a list predicates to the BalanceMutation builder.
@@ -271,12 +329,15 @@ func (m *BalanceMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BalanceMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 3)
 	if m.when != nil {
 		fields = append(fields, balance.FieldWhen)
 	}
-	if m.balance != nil {
-		fields = append(fields, balance.FieldBalance)
+	if m.in != nil {
+		fields = append(fields, balance.FieldIn)
+	}
+	if m.out != nil {
+		fields = append(fields, balance.FieldOut)
 	}
 	return fields
 }
@@ -288,8 +349,10 @@ func (m *BalanceMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case balance.FieldWhen:
 		return m.When()
-	case balance.FieldBalance:
-		return m.Balance()
+	case balance.FieldIn:
+		return m.In()
+	case balance.FieldOut:
+		return m.Out()
 	}
 	return nil, false
 }
@@ -301,8 +364,10 @@ func (m *BalanceMutation) OldField(ctx context.Context, name string) (ent.Value,
 	switch name {
 	case balance.FieldWhen:
 		return m.OldWhen(ctx)
-	case balance.FieldBalance:
-		return m.OldBalance(ctx)
+	case balance.FieldIn:
+		return m.OldIn(ctx)
+	case balance.FieldOut:
+		return m.OldOut(ctx)
 	}
 	return nil, fmt.Errorf("unknown Balance field %s", name)
 }
@@ -319,12 +384,19 @@ func (m *BalanceMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetWhen(v)
 		return nil
-	case balance.FieldBalance:
+	case balance.FieldIn:
 		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetBalance(v)
+		m.SetIn(v)
+		return nil
+	case balance.FieldOut:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOut(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Balance field %s", name)
@@ -334,8 +406,11 @@ func (m *BalanceMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *BalanceMutation) AddedFields() []string {
 	var fields []string
-	if m.addbalance != nil {
-		fields = append(fields, balance.FieldBalance)
+	if m.addin != nil {
+		fields = append(fields, balance.FieldIn)
+	}
+	if m.addout != nil {
+		fields = append(fields, balance.FieldOut)
 	}
 	return fields
 }
@@ -345,8 +420,10 @@ func (m *BalanceMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *BalanceMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case balance.FieldBalance:
-		return m.AddedBalance()
+	case balance.FieldIn:
+		return m.AddedIn()
+	case balance.FieldOut:
+		return m.AddedOut()
 	}
 	return nil, false
 }
@@ -356,12 +433,19 @@ func (m *BalanceMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *BalanceMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case balance.FieldBalance:
+	case balance.FieldIn:
 		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddBalance(v)
+		m.AddIn(v)
+		return nil
+	case balance.FieldOut:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddOut(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Balance numeric field %s", name)
@@ -393,8 +477,11 @@ func (m *BalanceMutation) ResetField(name string) error {
 	case balance.FieldWhen:
 		m.ResetWhen()
 		return nil
-	case balance.FieldBalance:
-		m.ResetBalance()
+	case balance.FieldIn:
+		m.ResetIn()
+		return nil
+	case balance.FieldOut:
+		m.ResetOut()
 		return nil
 	}
 	return fmt.Errorf("unknown Balance field %s", name)

@@ -15,8 +15,10 @@ const (
 	FieldID = "id"
 	// FieldWhen holds the string denoting the when field in the database.
 	FieldWhen = "when"
-	// FieldBalance holds the string denoting the balance field in the database.
-	FieldBalance = "balance"
+	// FieldIn holds the string denoting the in field in the database.
+	FieldIn = "in"
+	// FieldOut holds the string denoting the out field in the database.
+	FieldOut = "out"
 	// Table holds the table name of the balance in the database.
 	Table = "balances"
 )
@@ -25,7 +27,8 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldWhen,
-	FieldBalance,
+	FieldIn,
+	FieldOut,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -56,7 +59,12 @@ func ByWhen(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldWhen, opts...).ToFunc()
 }
 
-// ByBalance orders the results by the balance field.
-func ByBalance(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldBalance, opts...).ToFunc()
+// ByIn orders the results by the in field.
+func ByIn(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIn, opts...).ToFunc()
+}
+
+// ByOut orders the results by the out field.
+func ByOut(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOut, opts...).ToFunc()
 }
