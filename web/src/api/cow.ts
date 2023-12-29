@@ -1,6 +1,12 @@
 import { request } from '@/util/requests'
 import dayjs, { Dayjs } from 'dayjs'
-import type { Pagination, Paginated } from './types'
+import type { Paginated } from './types'
+
+export interface CowQueryParams {
+  page: number
+  size: number
+  filter: string
+}
 
 export interface CowInfo {
   id: string
@@ -10,7 +16,7 @@ export interface CowInfo {
   parent?: string
 }
 
-export const GetCowInfoByUuid = async (uuid: string): Promise<CowInfo> => {
+export const getCowInfoByUuid = async (uuid: string): Promise<CowInfo> => {
   const { dead_at, born_at, ...other } = await request<any, any>({
     method: 'get',
     url: `/cow/${uuid}/`
@@ -24,7 +30,7 @@ export const GetCowInfoByUuid = async (uuid: string): Promise<CowInfo> => {
   }
 }
 
-export const GetCowInfo = async (query: Pagination): Promise<Paginated<CowInfo>> => {
+export const getCowInfo = async (query: CowQueryParams): Promise<Paginated<CowInfo>> => {
   const { cnt, data } = await request<any, any>({
     method: 'get',
     url: `/cow/`,
@@ -45,3 +51,18 @@ export const GetCowInfo = async (query: Pagination): Promise<Paginated<CowInfo>>
     data: d
   }
 }
+
+export const spawnCow = async (): Promise<void> =>
+  request({
+    method: 'POST',
+    url: '/cow/spawn/'
+  })
+
+export const KillCow = async (cows: string[]): Promise<void> =>
+  request({
+    method: 'POST',
+    url: '/cow/kill/',
+    data: {
+      cows
+    }
+  })

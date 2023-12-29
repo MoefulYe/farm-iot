@@ -1,4 +1,4 @@
-import { Login, Register, type LoginReq, type RegisterReq } from '@/api/token'
+import { login, register, type LoginReq, type RegisterReq } from '@/api/token'
 import {
   NCard,
   NForm,
@@ -18,7 +18,7 @@ const login = defineComponent({
     const model = ref<LoginReq>({ username: '', passwd: '' })
     const formRef = ref<FormInst | null>(null)
     const submit = async () => {
-      await Login(model.value)
+      await login(model.value)
     }
     const validation = {
       username: {
@@ -77,7 +77,7 @@ const register = defineComponent({
     const model = ref<RegisterReq>({ username: '', passwd: '' })
     const formRef = ref<FormInst | null>(null)
     const submit = async () => {
-      await Register(model.value)
+      await register(model.value)
     }
     const validation = {
       username: {

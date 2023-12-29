@@ -15,7 +15,7 @@ export interface RegisterReq {
   passwd: string
 }
 
-export const Login = async (params: LoginReq): Promise<Token> => {
+export const login = async (params: LoginReq): Promise<Token> => {
   const token: Token = await request({
     method: 'post',
     url: '/login',
@@ -25,7 +25,7 @@ export const Login = async (params: LoginReq): Promise<Token> => {
   return token
 }
 
-export const Register = async (params: RegisterReq): Promise<Token> => {
+export const register = async (params: RegisterReq): Promise<Token> => {
   const token: Token = await request({
     method: 'post',
     url: '/register',

@@ -1,4 +1,4 @@
-import { Field, FieldName, GetKeepAliveByUuid, type Heartbeat } from '../api/heartbeat'
+import { Field, FieldName, getKeepAliveByUuid, type Heartbeat } from '../api/heartbeat'
 import dayjs from 'dayjs'
 import { NDatePicker, NPopover, NSelect, type SelectOption } from 'naive-ui/lib'
 import { computed, defineComponent, onMounted, ref, watch, type Ref } from 'vue'
@@ -168,7 +168,7 @@ export default defineComponent({
     const data = ref<Heartbeat[]>([])
     const fetch = () => {
       loading.value = true
-      GetKeepAliveByUuid(uuid, {
+      getKeepAliveByUuid(uuid, {
         fields: fieldSelected.value,
         ...rangeStr()
       }).then((ok) => {

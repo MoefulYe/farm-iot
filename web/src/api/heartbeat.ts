@@ -31,10 +31,10 @@ export interface QueryParams {
   fields: Field[]
 }
 
-export const GetKeepAlive = async ({ fields, ...other }: QueryParams): Promise<Heartbeat[]> => {
+export const getKeepAlive = async ({ fields, ...other }: QueryParams): Promise<Heartbeat[]> => {
   const arr: any[] | null = await request<any, any>({
     method: 'get',
-    url: '/cow/keep-alive',
+    url: '/cow/heartbeat',
     params: {
       fields: fields.join(','),
       ...other
@@ -54,13 +54,13 @@ export const GetKeepAlive = async ({ fields, ...other }: QueryParams): Promise<H
   }
 }
 
-export const GetKeepAliveByUuid = async (
+export const getKeepAliveByUuid = async (
   uuid: string,
   { fields, ...other }: QueryParams
 ): Promise<Heartbeat[]> => {
   const arr: any[] | null = await request({
     method: 'get',
-    url: `/cow/keep-alive/${uuid}`,
+    url: `/cow/heartbeat/${uuid}`,
     params: {
       fields: fields.join(','),
       ...other
