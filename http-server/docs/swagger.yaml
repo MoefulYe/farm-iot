@@ -1,6 +1,6 @@
 basePath: /api
 definitions:
-  models.DeviceInfo:
+  models.CowInfo:
     properties:
       born_at:
         type: string
@@ -8,10 +8,12 @@ definitions:
         type: string
       id:
         type: string
+      parent:
+        type: string
       reason:
         type: string
     type: object
-  models.KeepAlive:
+  models.HeartBeat:
     properties:
       health:
         type: number
@@ -25,6 +27,13 @@ definitions:
         type: string
       weight:
         type: number
+    type: object
+  models.KillCowReq:
+    properties:
+      cows:
+        items:
+          type: string
+        type: array
     type: object
   models.LoginReq:
     properties:
@@ -40,13 +49,13 @@ definitions:
       msg:
         type: string
     type: object
-  models.Paged-models_DeviceInfo:
+  models.Paged-models_CowInfo:
     properties:
       cnt:
         type: integer
       data:
         items:
-          $ref: '#/definitions/models.DeviceInfo'
+          $ref: '#/definitions/models.CowInfo'
         type: array
     type: object
   models.RegisterReq:
@@ -56,43 +65,54 @@ definitions:
       username:
         type: string
     type: object
-  models.Resp-Paged[models_DeviceInfo]:
+  models.Resp-Paged[models_CowInfo]:
     properties:
       code:
         type: integer
       data:
-        $ref: '#/definitions/models.Paged-models_DeviceInfo'
+        $ref: '#/definitions/models.Paged-models_CowInfo'
       msg:
         type: string
     type: object
-  models.Resp-array_models_DeviceInfo:
+  models.Resp-array_float64:
     properties:
       code:
         type: integer
       data:
         items:
-          $ref: '#/definitions/models.DeviceInfo'
+          type: number
         type: array
       msg:
         type: string
     type: object
-  models.Resp-array_models_KeepAlive:
+  models.Resp-array_models_CowInfo:
     properties:
       code:
         type: integer
       data:
         items:
-          $ref: '#/definitions/models.KeepAlive'
+          $ref: '#/definitions/models.CowInfo'
         type: array
       msg:
         type: string
     type: object
-  models.Resp-models_DeviceInfo:
+  models.Resp-array_models_HeartBeat:
     properties:
       code:
         type: integer
       data:
-        $ref: '#/definitions/models.DeviceInfo'
+        items:
+          $ref: '#/definitions/models.HeartBeat'
+        type: array
+      msg:
+        type: string
+    type: object
+  models.Resp-models_CowInfo:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/models.CowInfo'
       msg:
         type: string
     type: object
@@ -113,6 +133,38 @@ definitions:
 info:
   contact: {}
 paths:
+  /balance:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - in: query
+        name: from
+        type: string
+      - in: query
+        name: to
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/models.Resp-array_float64'
+        "400":
+          description: failure
+          schema:
+            $ref: '#/definitions/models.Msg'
+      security:
+      - ApiKeyAuth: []
+      summary: get balance
+      tags:
+      - balance
   /cow:
     get:
       consumes:
@@ -138,16 +190,16 @@ paths:
         "200":
           description: success
           schema:
-            $ref: '#/definitions/models.Resp-Paged[models_DeviceInfo]'
+            $ref: '#/definitions/models.Resp-Paged[models_CowInfo]'
         "400":
           description: failure
           schema:
             $ref: '#/definitions/models.Msg'
       security:
       - ApiKeyAuth: []
-      summary: get all info
+      summary: get cow info
       tags:
-      - getInfo
+      - cow
   /cow/{uuid}:
     get:
       consumes:
@@ -169,17 +221,17 @@ paths:
         "200":
           description: success
           schema:
-            $ref: '#/definitions/models.Resp-models_DeviceInfo'
+            $ref: '#/definitions/models.Resp-models_CowInfo'
         "400":
           description: failure
           schema:
             $ref: '#/definitions/models.Msg'
       security:
       - ApiKeyAuth: []
-      summary: get uuid info by uuid
+      summary: get cow info by uuid
       tags:
-      - getInfo
-  /cow/keep-alive:
+      - cow
+  /cow/heartbeat:
     get:
       consumes:
       - application/json
@@ -204,17 +256,17 @@ paths:
         "200":
           description: success
           schema:
-            $ref: '#/definitions/models.Resp-array_models_KeepAlive'
+            $ref: '#/definitions/models.Resp-array_models_HeartBeat'
         "400":
           description: failure
           schema:
             $ref: '#/definitions/models.Msg'
       security:
       - ApiKeyAuth: []
-      summary: keepalive
+      summary: get heartbeat
       tags:
-      - keep-alive
-  /cow/keep-alive/{uuid}:
+      - heartbeat
+  /cow/heartbeat/{uuid}:
     get:
       consumes:
       - application/json
@@ -244,16 +296,74 @@ paths:
         "200":
           description: success
           schema:
-            $ref: '#/definitions/models.Resp-array_models_DeviceInfo'
+            $ref: '#/definitions/models.Resp-array_models_CowInfo'
         "400":
           description: failure
           schema:
             $ref: '#/definitions/models.Msg'
       security:
       - ApiKeyAuth: []
-      summary: keepalive by uuid
+      summary: heartbeat by uuid
       tags:
-      - keep-alive
+      - heartbeat
+  /cow/kill:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: jwt
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: uuids
+        in: body
+        name: cows
+        required: true
+        schema:
+          $ref: '#/definitions/models.KillCowReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/models.Msg'
+        "400":
+          description: failure
+          schema:
+            $ref: '#/definitions/models.Msg'
+      security:
+      - ApiKeyAuth: []
+      summary: Kill cow
+      tags:
+      - cow
+  /cow/spawn:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: jwt
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/models.Msg'
+        "400":
+          description: failure
+          schema:
+            $ref: '#/definitions/models.Msg'
+      security:
+      - ApiKeyAuth: []
+      summary: spawn cow
+      tags:
+      - cow
   /login:
     post:
       consumes:

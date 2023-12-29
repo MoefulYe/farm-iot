@@ -118,7 +118,7 @@ func SpawnCow(c *gin.Context) {
 // @Param cows body models.KillCowReq true "uuids"
 // @Success 200 {object} models.Msg "success"
 // @Failure 400 {object} models.Msg "failure"
-// @Router /cow/spawn [post]
+// @Router /cow/kill [post]
 func KillCow(c *gin.Context) {
 	params := new(models.KillCowReq)
 	if err := c.BindJSON(params); err != nil {

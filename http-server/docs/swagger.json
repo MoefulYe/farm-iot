@@ -5,6 +5,58 @@
     },
     "basePath": "/api",
     "paths": {
+        "/balance": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "balance"
+                ],
+                "summary": "get balance",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/models.Resp-array_float64"
+                        }
+                    },
+                    "400": {
+                        "description": "failure",
+                        "schema": {
+                            "$ref": "#/definitions/models.Msg"
+                        }
+                    }
+                }
+            }
+        },
         "/cow": {
             "get": {
                 "security": [
@@ -19,9 +71,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "getInfo"
+                    "cow"
                 ],
-                "summary": "get all info",
+                "summary": "get cow info",
                 "parameters": [
                     {
                         "type": "string",
@@ -48,7 +100,7 @@
                     "200": {
                         "description": "success",
                         "schema": {
-                            "$ref": "#/definitions/models.Resp-Paged[models_DeviceInfo]"
+                            "$ref": "#/definitions/models.Resp-Paged[models_CowInfo]"
                         }
                     },
                     "400": {
@@ -60,7 +112,7 @@
                 }
             }
         },
-        "/cow/keep-alive": {
+        "/cow/heartbeat": {
             "get": {
                 "security": [
                     {
@@ -74,9 +126,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "keep-alive"
+                    "heartbeat"
                 ],
-                "summary": "keepalive",
+                "summary": "get heartbeat",
                 "parameters": [
                     {
                         "type": "string",
@@ -105,7 +157,7 @@
                     "200": {
                         "description": "success",
                         "schema": {
-                            "$ref": "#/definitions/models.Resp-array_models_KeepAlive"
+                            "$ref": "#/definitions/models.Resp-array_models_HeartBeat"
                         }
                     },
                     "400": {
@@ -117,7 +169,7 @@
                 }
             }
         },
-        "/cow/keep-alive/{uuid}": {
+        "/cow/heartbeat/{uuid}": {
             "get": {
                 "security": [
                     {
@@ -131,9 +183,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "keep-alive"
+                    "heartbeat"
                 ],
-                "summary": "keepalive by uuid",
+                "summary": "heartbeat by uuid",
                 "parameters": [
                     {
                         "type": "string",
@@ -169,7 +221,100 @@
                     "200": {
                         "description": "success",
                         "schema": {
-                            "$ref": "#/definitions/models.Resp-array_models_DeviceInfo"
+                            "$ref": "#/definitions/models.Resp-array_models_CowInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "failure",
+                        "schema": {
+                            "$ref": "#/definitions/models.Msg"
+                        }
+                    }
+                }
+            }
+        },
+        "/cow/kill": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cow"
+                ],
+                "summary": "Kill cow",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "uuids",
+                        "name": "cows",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.KillCowReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/models.Msg"
+                        }
+                    },
+                    "400": {
+                        "description": "failure",
+                        "schema": {
+                            "$ref": "#/definitions/models.Msg"
+                        }
+                    }
+                }
+            }
+        },
+        "/cow/spawn": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cow"
+                ],
+                "summary": "spawn cow",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/models.Msg"
                         }
                     },
                     "400": {
@@ -195,9 +340,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "getInfo"
+                    "cow"
                 ],
-                "summary": "get uuid info by uuid",
+                "summary": "get cow info by uuid",
                 "parameters": [
                     {
                         "type": "string",
@@ -218,7 +363,7 @@
                     "200": {
                         "description": "success",
                         "schema": {
-                            "$ref": "#/definitions/models.Resp-models_DeviceInfo"
+                            "$ref": "#/definitions/models.Resp-models_CowInfo"
                         }
                     },
                     "400": {
@@ -308,7 +453,7 @@
         }
     },
     "definitions": {
-        "models.DeviceInfo": {
+        "models.CowInfo": {
             "type": "object",
             "properties": {
                 "born_at": {
@@ -320,12 +465,15 @@
                 "id": {
                     "type": "string"
                 },
+                "parent": {
+                    "type": "string"
+                },
                 "reason": {
                     "type": "string"
                 }
             }
         },
-        "models.KeepAlive": {
+        "models.HeartBeat": {
             "type": "object",
             "properties": {
                 "health": {
@@ -345,6 +493,17 @@
                 },
                 "weight": {
                     "type": "number"
+                }
+            }
+        },
+        "models.KillCowReq": {
+            "type": "object",
+            "properties": {
+                "cows": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
@@ -370,7 +529,7 @@
                 }
             }
         },
-        "models.Paged-models_DeviceInfo": {
+        "models.Paged-models_CowInfo": {
             "type": "object",
             "properties": {
                 "cnt": {
@@ -379,7 +538,7 @@
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.DeviceInfo"
+                        "$ref": "#/definitions/models.CowInfo"
                     }
                 }
             }
@@ -395,21 +554,21 @@
                 }
             }
         },
-        "models.Resp-Paged[models_DeviceInfo]": {
+        "models.Resp-Paged[models_CowInfo]": {
             "type": "object",
             "properties": {
                 "code": {
                     "type": "integer"
                 },
                 "data": {
-                    "$ref": "#/definitions/models.Paged-models_DeviceInfo"
+                    "$ref": "#/definitions/models.Paged-models_CowInfo"
                 },
                 "msg": {
                     "type": "string"
                 }
             }
         },
-        "models.Resp-array_models_DeviceInfo": {
+        "models.Resp-array_float64": {
             "type": "object",
             "properties": {
                 "code": {
@@ -418,7 +577,7 @@
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.DeviceInfo"
+                        "type": "number"
                     }
                 },
                 "msg": {
@@ -426,7 +585,7 @@
                 }
             }
         },
-        "models.Resp-array_models_KeepAlive": {
+        "models.Resp-array_models_CowInfo": {
             "type": "object",
             "properties": {
                 "code": {
@@ -435,7 +594,7 @@
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.KeepAlive"
+                        "$ref": "#/definitions/models.CowInfo"
                     }
                 },
                 "msg": {
@@ -443,14 +602,31 @@
                 }
             }
         },
-        "models.Resp-models_DeviceInfo": {
+        "models.Resp-array_models_HeartBeat": {
             "type": "object",
             "properties": {
                 "code": {
                     "type": "integer"
                 },
                 "data": {
-                    "$ref": "#/definitions/models.DeviceInfo"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.HeartBeat"
+                    }
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Resp-models_CowInfo": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "$ref": "#/definitions/models.CowInfo"
                 },
                 "msg": {
                     "type": "string"

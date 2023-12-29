@@ -6,6 +6,7 @@ import (
 	"github.com/MoefulYe/farm-iot/http-server/models"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	_ "pg/ent"
 	"pg/ent/balance"
 	"time"
 )
@@ -18,7 +19,7 @@ import (
 // @Security ApiKeyAuth
 // @Param Authorization header string true "token"
 // @Param query-params query models.TimeRange true "范围"
-// @Success 200 {object} models.Resp[[]*ent.Balance] "success"
+// @Success 200 {object} models.Resp[[]float64] "success"
 // @Failure 400 {object} models.Msg "failure"
 // @Router /balance [get]
 func GetBalance(c *gin.Context) {

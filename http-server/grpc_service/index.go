@@ -1,10 +1,11 @@
 package grpc_service
 
 import (
+	"github.com/MoefulYe/farm-iot/http-server/config"
 	"github.com/MoefulYe/farm-iot/http-server/logger"
 	"github.com/MoefulYe/farm-iot/http-server/protoc-gen/grpc/service"
-	"github.com/MoefulYe/farm-iot/iot-server/config"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
@@ -13,7 +14,7 @@ var (
 )
 
 func init() {
-	_conn, err := grpc.Dial(config.Conf.GrpcAddr)
+	_conn, err := grpc.Dial(config.Conf.GrpcServer, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logger.Logger.Fatalw(err.Error())
 	}
