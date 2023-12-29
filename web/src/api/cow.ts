@@ -7,6 +7,7 @@ export interface CowInfo {
   born_at: Dayjs
   dead_at?: Dayjs
   reason?: string
+  parent: string
 }
 
 export const GetCowInfoByUuid = async (uuid: string): Promise<CowInfo> => {

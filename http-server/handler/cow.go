@@ -31,20 +31,22 @@ func GetCowInfoByUuid(c *gin.Context) {
 		return
 	}
 	resp := new(models.CowInfo)
-	d, err := db.PgClient.Device.
+	err = db.PgClient.Device.
 		Query().
 		Where(device.IDEQ(id)).
-		First(c)
+		Select(
+			device.FieldID,
+			device.FieldBornAt,
+			device.FieldDeadAt,
+			device.FieldReason,
+			device.FieldParent,
+		).
+		Scan(c, resp)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.MsgOnly(1, "no such cow"))
 		logger.Logger.Warnw(err.Error())
 		return
 	}
-	resp.Id = d.ID.String()
-	resp.DeadAt = d.DeadAt
-	resp.BornAt = d.BornAt
-	resp.Reason = d.Reason
-	resp.Parent = d.Parent.String()
 	c.JSON(http.StatusOK, models.NewResp(0, "ok", resp))
 }
 
