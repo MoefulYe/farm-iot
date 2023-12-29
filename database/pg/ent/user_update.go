@@ -33,6 +33,14 @@ func (uu *UserUpdate) SetPasswd(s string) *UserUpdate {
 	return uu
 }
 
+// SetNillablePasswd sets the "passwd" field if the given value is not nil.
+func (uu *UserUpdate) SetNillablePasswd(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetPasswd(*s)
+	}
+	return uu
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
@@ -100,6 +108,14 @@ type UserUpdateOne struct {
 // SetPasswd sets the "passwd" field.
 func (uuo *UserUpdateOne) SetPasswd(s string) *UserUpdateOne {
 	uuo.mutation.SetPasswd(s)
+	return uuo
+}
+
+// SetNillablePasswd sets the "passwd" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillablePasswd(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetPasswd(*s)
+	}
 	return uuo
 }
 

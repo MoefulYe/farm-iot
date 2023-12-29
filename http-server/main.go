@@ -3,11 +3,11 @@ package main
 import (
 	"github.com/MoefulYe/farm-iot/http-server/docs"
 	"github.com/MoefulYe/farm-iot/http-server/handler"
+	"github.com/MoefulYe/farm-iot/http-server/logger"
 	"github.com/MoefulYe/farm-iot/http-server/middleware"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"log"
 )
 
 // @BasePath /api
@@ -16,16 +16,18 @@ func main() {
 	docs.SwaggerInfo.BasePath = "/api"
 	r.POST("/api/login", handler.Login)
 	r.POST("/api/register", handler.Register)
-	s1 := r.Group("/api/cow/")
-	s1.Use(middleware.Jwt())
+	cowApi := r.Group("/api/cow/")
+	cowApi.Use(middleware.Jwt())
 	{
-		s1.GET("keep-alive", handler.GetKeepalive)
-		s1.GET("keep-alive/:uuid", handler.GetKeepaliveByUuid)
-		s1.GET(":uuid", handler.GetDeviceInfoByUuid)
-		s1.GET("", handler.GetDeviceInfo)
-	} //?start=&end=
+		cowApi.GET("heartbeat", handler.GetHeartbeat)
+		cowApi.GET("heartbeat/:uuid", handler.GetHeartbeatByUuid)
+		cowApi.POST("spawn", handler.SpawnCow)
+		cowApi.POST("kill", handler.KillCow)
+		cowApi.GET(":uuid", handler.GetCowInfoByUuid)
+		cowApi.GET("", handler.GetCowInfo)
+	}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	if err := r.Run(":8080"); err != nil {
-		log.Fatalf(err.Error())
+		logger.Logger.Fatalw(err.Error())
 	}
 }

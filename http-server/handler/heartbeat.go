@@ -2,29 +2,31 @@ package handler
 
 import (
 	"fmt"
-	"github.com/MoefulYe/farm-iot/http-server/db"
-	"github.com/MoefulYe/farm-iot/http-server/models"
-	"github.com/MoefulYe/farm-iot/http-server/utils"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/MoefulYe/farm-iot/http-server/db"
+	"github.com/MoefulYe/farm-iot/http-server/logger"
+	"github.com/MoefulYe/farm-iot/http-server/models"
+	"github.com/MoefulYe/farm-iot/http-server/utils"
+	"github.com/gin-gonic/gin"
 )
 
-// GetKeepaliveByUuid
-// @Tags keep-alive
-// @Summary keepalive by uuid
+// GetHeartbeatByUuid
+// @Tags heartbeat
+// @Summary heartbeat by uuid
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
 // @Param Authorization header string true "jwt"
 // @Param uuid path string true  "uuid"
 // @Param query-params query models.RangeQuery true "范围, 查询字段"
-// @Success 200 {object} models.Resp[[]models.DeviceInfo] "success"
+// @Success 200 {object} models.Resp[[]models.CowInfo] "success"
 // @Failure 400 {object} models.Msg "failure"
-// @Router /cow/keep-alive/{uuid} [get]
-func GetKeepaliveByUuid(c *gin.Context) {
+// @Router /cow/heartbeat/{uuid} [get]
+func GetHeartbeatByUuid(c *gin.Context) {
 	var query models.RangeQuery
 	if err := c.BindQuery(&query); err != nil {
 		c.JSON(http.StatusBadRequest, models.MsgOnly(1, err.Error()))
@@ -35,15 +37,15 @@ func GetKeepaliveByUuid(c *gin.Context) {
 	ranges := ranges(query.Start, query.Stop)
 	filter := fieldFilter(fields)
 	flux := buildFlux4SelectedUuid(ranges, filter, uuid)
-	println(flux)
 	res, err := db.QueryAPI.Query(c, flux)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.MsgOnly(1, err.Error()))
+		logger.Logger.Fatalw(err.Error())
 		return
 	}
-	var ret []models.KeepAlive
+	var ret []models.HeartBeat
 	for res.Next() {
-		var data models.KeepAlive
+		var data models.HeartBeat
 		value := reflect.ValueOf(&data).Elem()
 		data.Id = res.Record().ValueByKey("uuid").(string)
 		data.Time = res.Record().ValueByKey("_time").(time.Time)
@@ -57,23 +59,24 @@ func GetKeepaliveByUuid(c *gin.Context) {
 	}
 	if res.Err() != nil {
 		c.JSON(http.StatusBadRequest, models.MsgOnly(1, res.Err().Error()))
+		logger.Logger.Warnw(res.Err().Error())
 		return
 	}
 	c.JSON(http.StatusOK, models.NewResp(0, "ok", ret))
 }
 
-// GetKeepalive
-// @Tags keep-alive
-// @Summary keepalive
+// GetHeartbeat
+// @Tags heartbeat
+// @Summary get heartbeat
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
 // @Param Authorization header string true "token"
 // @Param query-params query models.RangeQuery true "范围, 查询字段"
-// @Success 200 {object} models.Resp[[]models.KeepAlive] "success"
+// @Success 200 {object} models.Resp[[]models.HeartBeat] "success"
 // @Failure 400 {object} models.Msg "failure"
-// @Router /cow/keep-alive [get]
-func GetKeepalive(c *gin.Context) {
+// @Router /cow/heartbeat [get]
+func GetHeartbeat(c *gin.Context) {
 	var query models.RangeQuery
 	if err := c.BindQuery(&query); err != nil {
 		c.JSON(http.StatusBadRequest, models.MsgOnly(1, err.Error()))
@@ -85,12 +88,13 @@ func GetKeepalive(c *gin.Context) {
 	flux := buildFlux(ranges, filter)
 	res, err := db.QueryAPI.Query(c, flux)
 	if err != nil {
+		logger.Logger.Warnw(err.Error())
 		c.JSON(http.StatusBadRequest, models.MsgOnly(1, err.Error()))
 		return
 	}
-	var ret []models.KeepAlive
+	var ret []models.HeartBeat
 	for res.Next() {
-		var data models.KeepAlive
+		var data models.HeartBeat
 		value := reflect.ValueOf(&data).Elem()
 		data.Id = res.Record().ValueByKey("uuid").(string)
 		data.Time = res.Record().ValueByKey("_time").(time.Time)
@@ -103,6 +107,7 @@ func GetKeepalive(c *gin.Context) {
 		ret = append(ret, data)
 	}
 	if res.Err() != nil {
+		logger.Logger.Warnw(res.Err().Error())
 		c.JSON(http.StatusBadRequest, models.MsgOnly(1, res.Err().Error()))
 		return
 	}

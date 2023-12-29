@@ -25,18 +25,19 @@ type Device struct {
 	// DeadAt holds the value of the "dead_at" field.
 	DeadAt *time.Time `json:"dead_at,omitempty"`
 	// Reason holds the value of the "reason" field.
-	Reason *string `json:"reason,omitempty"`
+	Reason string `json:"reason,omitempty"`
+	// Parent holds the value of the "parent" field.
+	Parent uuid.UUID `json:"parent,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the DeviceQuery when eager-loading is set.
-	Edges           DeviceEdges `json:"edges"`
-	device_children *uuid.UUID
-	selectValues    sql.SelectValues
+	Edges        DeviceEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // DeviceEdges holds the relations/edges for other nodes in the graph.
 type DeviceEdges struct {
-	// Parent holds the value of the parent edge.
-	Parent *Device `json:"parent,omitempty"`
+	// Mother holds the value of the mother edge.
+	Mother *Device `json:"mother,omitempty"`
 	// Children holds the value of the children edge.
 	Children []*Device `json:"children,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -44,17 +45,17 @@ type DeviceEdges struct {
 	loadedTypes [2]bool
 }
 
-// ParentOrErr returns the Parent value or an error if the edge
+// MotherOrErr returns the Mother value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e DeviceEdges) ParentOrErr() (*Device, error) {
+func (e DeviceEdges) MotherOrErr() (*Device, error) {
 	if e.loadedTypes[0] {
-		if e.Parent == nil {
+		if e.Mother == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: device.Label}
 		}
-		return e.Parent, nil
+		return e.Mother, nil
 	}
-	return nil, &NotLoadedError{edge: "parent"}
+	return nil, &NotLoadedError{edge: "mother"}
 }
 
 // ChildrenOrErr returns the Children value or an error if the edge
@@ -75,10 +76,8 @@ func (*Device) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case device.FieldBornAt, device.FieldDeadAt:
 			values[i] = new(sql.NullTime)
-		case device.FieldID:
+		case device.FieldID, device.FieldParent:
 			values[i] = new(uuid.UUID)
-		case device.ForeignKeys[0]: // device_children
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -123,15 +122,13 @@ func (d *Device) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field reason", values[i])
 			} else if value.Valid {
-				d.Reason = new(string)
-				*d.Reason = value.String
+				d.Reason = value.String
 			}
-		case device.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field device_children", values[i])
-			} else if value.Valid {
-				d.device_children = new(uuid.UUID)
-				*d.device_children = *value.S.(*uuid.UUID)
+		case device.FieldParent:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field parent", values[i])
+			} else if value != nil {
+				d.Parent = *value
 			}
 		default:
 			d.selectValues.Set(columns[i], values[i])
@@ -146,9 +143,9 @@ func (d *Device) Value(name string) (ent.Value, error) {
 	return d.selectValues.Get(name)
 }
 
-// QueryParent queries the "parent" edge of the Device entity.
-func (d *Device) QueryParent() *DeviceQuery {
-	return NewDeviceClient(d.config).QueryParent(d)
+// QueryMother queries the "mother" edge of the Device entity.
+func (d *Device) QueryMother() *DeviceQuery {
+	return NewDeviceClient(d.config).QueryMother(d)
 }
 
 // QueryChildren queries the "children" edge of the Device entity.
@@ -190,10 +187,11 @@ func (d *Device) String() string {
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	if v := d.Reason; v != nil {
-		builder.WriteString("reason=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString("reason=")
+	builder.WriteString(d.Reason)
+	builder.WriteString(", ")
+	builder.WriteString("parent=")
+	builder.WriteString(fmt.Sprintf("%v", d.Parent))
 	builder.WriteByte(')')
 	return builder.String()
 }

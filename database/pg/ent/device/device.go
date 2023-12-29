@@ -20,20 +20,22 @@ const (
 	FieldDeadAt = "dead_at"
 	// FieldReason holds the string denoting the reason field in the database.
 	FieldReason = "reason"
-	// EdgeParent holds the string denoting the parent edge name in mutations.
-	EdgeParent = "parent"
+	// FieldParent holds the string denoting the parent field in the database.
+	FieldParent = "parent"
+	// EdgeMother holds the string denoting the mother edge name in mutations.
+	EdgeMother = "mother"
 	// EdgeChildren holds the string denoting the children edge name in mutations.
 	EdgeChildren = "children"
 	// Table holds the table name of the device in the database.
 	Table = "devices"
-	// ParentTable is the table that holds the parent relation/edge.
-	ParentTable = "devices"
-	// ParentColumn is the table column denoting the parent relation/edge.
-	ParentColumn = "device_children"
+	// MotherTable is the table that holds the mother relation/edge.
+	MotherTable = "devices"
+	// MotherColumn is the table column denoting the mother relation/edge.
+	MotherColumn = "parent"
 	// ChildrenTable is the table that holds the children relation/edge.
 	ChildrenTable = "devices"
 	// ChildrenColumn is the table column denoting the children relation/edge.
-	ChildrenColumn = "device_children"
+	ChildrenColumn = "parent"
 )
 
 // Columns holds all SQL columns for device fields.
@@ -43,23 +45,13 @@ var Columns = []string{
 	FieldHashedPasswd,
 	FieldDeadAt,
 	FieldReason,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "devices"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"device_children",
+	FieldParent,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -94,10 +86,15 @@ func ByReason(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldReason, opts...).ToFunc()
 }
 
-// ByParentField orders the results by parent field.
-func ByParentField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByParent orders the results by the parent field.
+func ByParent(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldParent, opts...).ToFunc()
+}
+
+// ByMotherField orders the results by mother field.
+func ByMotherField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newParentStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newMotherStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -114,11 +111,11 @@ func ByChildren(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newChildrenStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newParentStep() *sqlgraph.Step {
+func newMotherStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(Table, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, ParentTable, ParentColumn),
+		sqlgraph.Edge(sqlgraph.M2O, true, MotherTable, MotherColumn),
 	)
 }
 func newChildrenStep() *sqlgraph.Step {

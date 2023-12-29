@@ -27,7 +27,7 @@ var (
 		{Name: "hashed_passwd", Type: field.TypeString},
 		{Name: "dead_at", Type: field.TypeTime, Nullable: true},
 		{Name: "reason", Type: field.TypeString, Nullable: true},
-		{Name: "device_children", Type: field.TypeUUID, Nullable: true},
+		{Name: "parent", Type: field.TypeUUID, Nullable: true},
 	}
 	// DevicesTable holds the schema information for the "devices" table.
 	DevicesTable = &schema.Table{

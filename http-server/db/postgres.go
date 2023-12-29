@@ -1,11 +1,11 @@
 package db
 
 import (
-	"context"
-	"fmt"
-	"github.com/MoefulYe/farm-iot/database/postgres/ent"
+	"github.com/MoefulYe/farm-iot/http-server/config"
+	"github.com/MoefulYe/farm-iot/http-server/ctx"
+	"github.com/MoefulYe/farm-iot/http-server/logger"
 	_ "github.com/lib/pq"
-	"log"
+	"pg/ent"
 )
 
 var (
@@ -13,14 +13,17 @@ var (
 )
 
 func init() {
-	client, err := ent.Open("postgres", "host=124.221.89.92 port=5432 user=farmer password=mysecretpassword dbname=farm-iot sslmode=disable")
+	client, err := ent.Open(
+		"postgres",
+		config.Conf.Postgres,
+	)
 	if err != nil {
-		log.Fatalf(err.Error())
+		logger.Logger.Fatalw(err.Error())
 	}
-	fmt.Printf("ent ok")
-	err = client.Schema.Create(context.Background())
+	err = client.Schema.Create(ctx.Bg)
 	if err != nil {
-		log.Fatalf(err.Error())
+		logger.Logger.Fatalw(err.Error())
 	}
 	PgClient = client
+	logger.Logger.Infow("postgres connected")
 }

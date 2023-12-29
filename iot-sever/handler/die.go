@@ -16,14 +16,17 @@ func DieHandler(_ mqtt.Client, msg mqtt.Message) {
 	die := new(command.Die)
 	if err := proto.Unmarshal(msg.Payload(), die); err != nil {
 		logger.Logger.Warnw(err.Error())
+		return
 	}
 	id := uuid.MustParse(die.Uuid)
 	ts, err := time.Parse(time.RFC3339, die.Timestamp)
 	if err != nil {
 		logger.Logger.Warnw(err.Error())
+		return
 	}
 	if err = db.PgClient.Device.UpdateOneID(id).SetDeadAt(ts).SetReason(die.Reason).Exec(Ctx); err != nil {
 		logger.Logger.Warnw(err.Error())
+		return
 	}
 
 	if die.Reason == "kill" {

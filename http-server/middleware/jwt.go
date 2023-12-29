@@ -21,7 +21,6 @@ func Jwt() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		// 将解析后的有效载荷claims重新写入gin.Context引用对象中
 		c.Set("claims", claims)
 	}
 

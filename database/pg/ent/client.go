@@ -37,9 +37,7 @@ type Client struct {
 
 // NewClient creates a new client configured with the given options.
 func NewClient(opts ...Option) *Client {
-	cfg := config{log: log.Println, hooks: &hooks{}, inters: &inters{}}
-	cfg.options(opts...)
-	client := &Client{config: cfg}
+	client := &Client{config: newConfig(opts...)}
 	client.init()
 	return client
 }
@@ -68,6 +66,13 @@ type (
 	// Option function to configure the client.
 	Option func(*config)
 )
+
+// newConfig creates a new config for the client.
+func newConfig(opts ...Option) config {
+	cfg := config{log: log.Println, hooks: &hooks{}, inters: &inters{}}
+	cfg.options(opts...)
+	return cfg
+}
 
 // options applies the options on the config object.
 func (c *config) options(opts ...Option) {
@@ -455,15 +460,15 @@ func (c *DeviceClient) GetX(ctx context.Context, id uuid.UUID) *Device {
 	return obj
 }
 
-// QueryParent queries the parent edge of a Device.
-func (c *DeviceClient) QueryParent(d *Device) *DeviceQuery {
+// QueryMother queries the mother edge of a Device.
+func (c *DeviceClient) QueryMother(d *Device) *DeviceQuery {
 	query := (&DeviceClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := d.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(device.Table, device.FieldID, id),
 			sqlgraph.To(device.Table, device.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, device.ParentTable, device.ParentColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, device.MotherTable, device.MotherColumn),
 		)
 		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
 		return fromV, nil

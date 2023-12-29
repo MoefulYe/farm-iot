@@ -76,6 +76,11 @@ func Reason(v string) predicate.Device {
 	return predicate.Device(sql.FieldEQ(FieldReason, v))
 }
 
+// Parent applies equality check predicate on the "parent" field. It's identical to ParentEQ.
+func Parent(v uuid.UUID) predicate.Device {
+	return predicate.Device(sql.FieldEQ(FieldParent, v))
+}
+
 // BornAtEQ applies the EQ predicate on the "born_at" field.
 func BornAtEQ(v time.Time) predicate.Device {
 	return predicate.Device(sql.FieldEQ(FieldBornAt, v))
@@ -306,21 +311,51 @@ func ReasonContainsFold(v string) predicate.Device {
 	return predicate.Device(sql.FieldContainsFold(FieldReason, v))
 }
 
-// HasParent applies the HasEdge predicate on the "parent" edge.
-func HasParent() predicate.Device {
+// ParentEQ applies the EQ predicate on the "parent" field.
+func ParentEQ(v uuid.UUID) predicate.Device {
+	return predicate.Device(sql.FieldEQ(FieldParent, v))
+}
+
+// ParentNEQ applies the NEQ predicate on the "parent" field.
+func ParentNEQ(v uuid.UUID) predicate.Device {
+	return predicate.Device(sql.FieldNEQ(FieldParent, v))
+}
+
+// ParentIn applies the In predicate on the "parent" field.
+func ParentIn(vs ...uuid.UUID) predicate.Device {
+	return predicate.Device(sql.FieldIn(FieldParent, vs...))
+}
+
+// ParentNotIn applies the NotIn predicate on the "parent" field.
+func ParentNotIn(vs ...uuid.UUID) predicate.Device {
+	return predicate.Device(sql.FieldNotIn(FieldParent, vs...))
+}
+
+// ParentIsNil applies the IsNil predicate on the "parent" field.
+func ParentIsNil() predicate.Device {
+	return predicate.Device(sql.FieldIsNull(FieldParent))
+}
+
+// ParentNotNil applies the NotNil predicate on the "parent" field.
+func ParentNotNil() predicate.Device {
+	return predicate.Device(sql.FieldNotNull(FieldParent))
+}
+
+// HasMother applies the HasEdge predicate on the "mother" edge.
+func HasMother() predicate.Device {
 	return predicate.Device(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ParentTable, ParentColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, MotherTable, MotherColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasParentWith applies the HasEdge predicate on the "parent" edge with a given conditions (other predicates).
-func HasParentWith(preds ...predicate.Device) predicate.Device {
+// HasMotherWith applies the HasEdge predicate on the "mother" edge with a given conditions (other predicates).
+func HasMotherWith(preds ...predicate.Device) predicate.Device {
 	return predicate.Device(func(s *sql.Selector) {
-		step := newParentStep()
+		step := newMotherStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

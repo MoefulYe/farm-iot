@@ -35,6 +35,14 @@ func (du *DeviceUpdate) SetHashedPasswd(s string) *DeviceUpdate {
 	return du
 }
 
+// SetNillableHashedPasswd sets the "hashed_passwd" field if the given value is not nil.
+func (du *DeviceUpdate) SetNillableHashedPasswd(s *string) *DeviceUpdate {
+	if s != nil {
+		du.SetHashedPasswd(*s)
+	}
+	return du
+}
+
 // SetDeadAt sets the "dead_at" field.
 func (du *DeviceUpdate) SetDeadAt(t time.Time) *DeviceUpdate {
 	du.mutation.SetDeadAt(t)
@@ -75,23 +83,43 @@ func (du *DeviceUpdate) ClearReason() *DeviceUpdate {
 	return du
 }
 
-// SetParentID sets the "parent" edge to the Device entity by ID.
-func (du *DeviceUpdate) SetParentID(id uuid.UUID) *DeviceUpdate {
-	du.mutation.SetParentID(id)
+// SetParent sets the "parent" field.
+func (du *DeviceUpdate) SetParent(u uuid.UUID) *DeviceUpdate {
+	du.mutation.SetParent(u)
 	return du
 }
 
-// SetNillableParentID sets the "parent" edge to the Device entity by ID if the given value is not nil.
-func (du *DeviceUpdate) SetNillableParentID(id *uuid.UUID) *DeviceUpdate {
-	if id != nil {
-		du = du.SetParentID(*id)
+// SetNillableParent sets the "parent" field if the given value is not nil.
+func (du *DeviceUpdate) SetNillableParent(u *uuid.UUID) *DeviceUpdate {
+	if u != nil {
+		du.SetParent(*u)
 	}
 	return du
 }
 
-// SetParent sets the "parent" edge to the Device entity.
-func (du *DeviceUpdate) SetParent(d *Device) *DeviceUpdate {
-	return du.SetParentID(d.ID)
+// ClearParent clears the value of the "parent" field.
+func (du *DeviceUpdate) ClearParent() *DeviceUpdate {
+	du.mutation.ClearParent()
+	return du
+}
+
+// SetMotherID sets the "mother" edge to the Device entity by ID.
+func (du *DeviceUpdate) SetMotherID(id uuid.UUID) *DeviceUpdate {
+	du.mutation.SetMotherID(id)
+	return du
+}
+
+// SetNillableMotherID sets the "mother" edge to the Device entity by ID if the given value is not nil.
+func (du *DeviceUpdate) SetNillableMotherID(id *uuid.UUID) *DeviceUpdate {
+	if id != nil {
+		du = du.SetMotherID(*id)
+	}
+	return du
+}
+
+// SetMother sets the "mother" edge to the Device entity.
+func (du *DeviceUpdate) SetMother(d *Device) *DeviceUpdate {
+	return du.SetMotherID(d.ID)
 }
 
 // AddChildIDs adds the "children" edge to the Device entity by IDs.
@@ -114,9 +142,9 @@ func (du *DeviceUpdate) Mutation() *DeviceMutation {
 	return du.mutation
 }
 
-// ClearParent clears the "parent" edge to the Device entity.
-func (du *DeviceUpdate) ClearParent() *DeviceUpdate {
-	du.mutation.ClearParent()
+// ClearMother clears the "mother" edge to the Device entity.
+func (du *DeviceUpdate) ClearMother() *DeviceUpdate {
+	du.mutation.ClearMother()
 	return du
 }
 
@@ -192,12 +220,12 @@ func (du *DeviceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if du.mutation.ReasonCleared() {
 		_spec.ClearField(device.FieldReason, field.TypeString)
 	}
-	if du.mutation.ParentCleared() {
+	if du.mutation.MotherCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   device.ParentTable,
-			Columns: []string{device.ParentColumn},
+			Table:   device.MotherTable,
+			Columns: []string{device.MotherColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeUUID),
@@ -205,12 +233,12 @@ func (du *DeviceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := du.mutation.ParentIDs(); len(nodes) > 0 {
+	if nodes := du.mutation.MotherIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   device.ParentTable,
-			Columns: []string{device.ParentColumn},
+			Table:   device.MotherTable,
+			Columns: []string{device.MotherColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeUUID),
@@ -292,6 +320,14 @@ func (duo *DeviceUpdateOne) SetHashedPasswd(s string) *DeviceUpdateOne {
 	return duo
 }
 
+// SetNillableHashedPasswd sets the "hashed_passwd" field if the given value is not nil.
+func (duo *DeviceUpdateOne) SetNillableHashedPasswd(s *string) *DeviceUpdateOne {
+	if s != nil {
+		duo.SetHashedPasswd(*s)
+	}
+	return duo
+}
+
 // SetDeadAt sets the "dead_at" field.
 func (duo *DeviceUpdateOne) SetDeadAt(t time.Time) *DeviceUpdateOne {
 	duo.mutation.SetDeadAt(t)
@@ -332,23 +368,43 @@ func (duo *DeviceUpdateOne) ClearReason() *DeviceUpdateOne {
 	return duo
 }
 
-// SetParentID sets the "parent" edge to the Device entity by ID.
-func (duo *DeviceUpdateOne) SetParentID(id uuid.UUID) *DeviceUpdateOne {
-	duo.mutation.SetParentID(id)
+// SetParent sets the "parent" field.
+func (duo *DeviceUpdateOne) SetParent(u uuid.UUID) *DeviceUpdateOne {
+	duo.mutation.SetParent(u)
 	return duo
 }
 
-// SetNillableParentID sets the "parent" edge to the Device entity by ID if the given value is not nil.
-func (duo *DeviceUpdateOne) SetNillableParentID(id *uuid.UUID) *DeviceUpdateOne {
-	if id != nil {
-		duo = duo.SetParentID(*id)
+// SetNillableParent sets the "parent" field if the given value is not nil.
+func (duo *DeviceUpdateOne) SetNillableParent(u *uuid.UUID) *DeviceUpdateOne {
+	if u != nil {
+		duo.SetParent(*u)
 	}
 	return duo
 }
 
-// SetParent sets the "parent" edge to the Device entity.
-func (duo *DeviceUpdateOne) SetParent(d *Device) *DeviceUpdateOne {
-	return duo.SetParentID(d.ID)
+// ClearParent clears the value of the "parent" field.
+func (duo *DeviceUpdateOne) ClearParent() *DeviceUpdateOne {
+	duo.mutation.ClearParent()
+	return duo
+}
+
+// SetMotherID sets the "mother" edge to the Device entity by ID.
+func (duo *DeviceUpdateOne) SetMotherID(id uuid.UUID) *DeviceUpdateOne {
+	duo.mutation.SetMotherID(id)
+	return duo
+}
+
+// SetNillableMotherID sets the "mother" edge to the Device entity by ID if the given value is not nil.
+func (duo *DeviceUpdateOne) SetNillableMotherID(id *uuid.UUID) *DeviceUpdateOne {
+	if id != nil {
+		duo = duo.SetMotherID(*id)
+	}
+	return duo
+}
+
+// SetMother sets the "mother" edge to the Device entity.
+func (duo *DeviceUpdateOne) SetMother(d *Device) *DeviceUpdateOne {
+	return duo.SetMotherID(d.ID)
 }
 
 // AddChildIDs adds the "children" edge to the Device entity by IDs.
@@ -371,9 +427,9 @@ func (duo *DeviceUpdateOne) Mutation() *DeviceMutation {
 	return duo.mutation
 }
 
-// ClearParent clears the "parent" edge to the Device entity.
-func (duo *DeviceUpdateOne) ClearParent() *DeviceUpdateOne {
-	duo.mutation.ClearParent()
+// ClearMother clears the "mother" edge to the Device entity.
+func (duo *DeviceUpdateOne) ClearMother() *DeviceUpdateOne {
+	duo.mutation.ClearMother()
 	return duo
 }
 
@@ -479,12 +535,12 @@ func (duo *DeviceUpdateOne) sqlSave(ctx context.Context) (_node *Device, err err
 	if duo.mutation.ReasonCleared() {
 		_spec.ClearField(device.FieldReason, field.TypeString)
 	}
-	if duo.mutation.ParentCleared() {
+	if duo.mutation.MotherCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   device.ParentTable,
-			Columns: []string{device.ParentColumn},
+			Table:   device.MotherTable,
+			Columns: []string{device.MotherColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeUUID),
@@ -492,12 +548,12 @@ func (duo *DeviceUpdateOne) sqlSave(ctx context.Context) (_node *Device, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := duo.mutation.ParentIDs(); len(nodes) > 0 {
+	if nodes := duo.mutation.MotherIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   device.ParentTable,
-			Columns: []string{device.ParentColumn},
+			Table:   device.MotherTable,
+			Columns: []string{device.MotherColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeUUID),

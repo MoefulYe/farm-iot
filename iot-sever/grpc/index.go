@@ -38,7 +38,7 @@ type grpcService struct {
 }
 
 func (*grpcService) Spawn(_ context.Context, _ *service.SpawnReq) (*service.SpawnResp, error) {
-	if token := server.Server.Publish("spawner/spawn", 0, false, []byte{}); token.Wait() && token.Error() != nil {
+	if token := server.Server.Publish("farm/spawn", 0, false, []byte{}); token.Wait() && token.Error() != nil {
 		err := token.Error()
 		logger.Logger.Warnw(err.Error())
 		return nil, err

@@ -54,7 +54,7 @@ func RegisterHandler(server mqtt.Client, msg mqtt.Message) {
 			handleRegisterResult(server, payload.GetUuid(), register.Status_STATUS_FAILED, "")
 			return
 		}
-		if _, err = query.SetParentID(parent).Save(Ctx); err != nil {
+		if _, err = query.SetMotherID(parent).Save(Ctx); err != nil {
 			Logger.Warnw("register error: save device error", "error", err.Error())
 			handleRegisterResult(server, payload.GetUuid(), register.Status_STATUS_FAILED, "")
 			return

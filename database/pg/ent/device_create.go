@@ -61,29 +61,43 @@ func (dc *DeviceCreate) SetNillableReason(s *string) *DeviceCreate {
 	return dc
 }
 
+// SetParent sets the "parent" field.
+func (dc *DeviceCreate) SetParent(u uuid.UUID) *DeviceCreate {
+	dc.mutation.SetParent(u)
+	return dc
+}
+
+// SetNillableParent sets the "parent" field if the given value is not nil.
+func (dc *DeviceCreate) SetNillableParent(u *uuid.UUID) *DeviceCreate {
+	if u != nil {
+		dc.SetParent(*u)
+	}
+	return dc
+}
+
 // SetID sets the "id" field.
 func (dc *DeviceCreate) SetID(u uuid.UUID) *DeviceCreate {
 	dc.mutation.SetID(u)
 	return dc
 }
 
-// SetParentID sets the "parent" edge to the Device entity by ID.
-func (dc *DeviceCreate) SetParentID(id uuid.UUID) *DeviceCreate {
-	dc.mutation.SetParentID(id)
+// SetMotherID sets the "mother" edge to the Device entity by ID.
+func (dc *DeviceCreate) SetMotherID(id uuid.UUID) *DeviceCreate {
+	dc.mutation.SetMotherID(id)
 	return dc
 }
 
-// SetNillableParentID sets the "parent" edge to the Device entity by ID if the given value is not nil.
-func (dc *DeviceCreate) SetNillableParentID(id *uuid.UUID) *DeviceCreate {
+// SetNillableMotherID sets the "mother" edge to the Device entity by ID if the given value is not nil.
+func (dc *DeviceCreate) SetNillableMotherID(id *uuid.UUID) *DeviceCreate {
 	if id != nil {
-		dc = dc.SetParentID(*id)
+		dc = dc.SetMotherID(*id)
 	}
 	return dc
 }
 
-// SetParent sets the "parent" edge to the Device entity.
-func (dc *DeviceCreate) SetParent(d *Device) *DeviceCreate {
-	return dc.SetParentID(d.ID)
+// SetMother sets the "mother" edge to the Device entity.
+func (dc *DeviceCreate) SetMother(d *Device) *DeviceCreate {
+	return dc.SetMotherID(d.ID)
 }
 
 // AddChildIDs adds the "children" edge to the Device entity by IDs.
@@ -190,14 +204,14 @@ func (dc *DeviceCreate) createSpec() (*Device, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := dc.mutation.Reason(); ok {
 		_spec.SetField(device.FieldReason, field.TypeString, value)
-		_node.Reason = &value
+		_node.Reason = value
 	}
-	if nodes := dc.mutation.ParentIDs(); len(nodes) > 0 {
+	if nodes := dc.mutation.MotherIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   device.ParentTable,
-			Columns: []string{device.ParentColumn},
+			Table:   device.MotherTable,
+			Columns: []string{device.MotherColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeUUID),
@@ -206,7 +220,7 @@ func (dc *DeviceCreate) createSpec() (*Device, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.device_children = &nodes[0]
+		_node.Parent = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := dc.mutation.ChildrenIDs(); len(nodes) > 0 {

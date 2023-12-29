@@ -1,13 +1,12 @@
 package handler
 
 import (
-	"context"
-	"github.com/MoefulYe/farm-iot/database/postgres/ent/user"
 	"github.com/MoefulYe/farm-iot/http-server/db"
 	"github.com/MoefulYe/farm-iot/http-server/models"
 	"github.com/MoefulYe/farm-iot/http-server/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"pg/ent/user"
 )
 
 // Login 登录
@@ -26,7 +25,7 @@ func Login(c *gin.Context) {
 	}
 	username := body.Username
 	passwd := body.Passwd
-	d, err := db.PgClient.User.Query().Where(user.UsernameEQ(username)).First(context.Background())
+	d, err := db.PgClient.User.Query().Where(user.UsernameEQ(username)).First(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.MsgOnly(1, "no such username!"))
 		return

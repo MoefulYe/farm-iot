@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-type KeepAlive struct {
+type HeartBeat struct {
 	Id        string    `json:"id"`
 	Time      time.Time `json:"time"`
 	Health    float64   `json:"health,omitempty"`

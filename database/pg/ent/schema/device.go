@@ -19,13 +19,14 @@ func (Device) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).Immutable().Unique(),
 		field.String("hashed_passwd"),
 		field.Time("dead_at").Optional().Nillable(),
-		field.String("reason").Optional().Nillable(),
+		field.String("reason").Optional(),
+		field.UUID("parent", uuid.UUID{}).Optional(),
 	}
 }
 
 // Edges of the Device.
 func (Device) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("children", Device.Type).From("parent").Unique(),
+		edge.To("children", Device.Type).From("mother").Field("parent").Unique(),
 	}
 }

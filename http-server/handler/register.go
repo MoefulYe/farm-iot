@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"context"
 	"github.com/MoefulYe/farm-iot/http-server/db"
+	"github.com/MoefulYe/farm-iot/http-server/logger"
 	"github.com/MoefulYe/farm-iot/http-server/models"
 	"github.com/MoefulYe/farm-iot/http-server/utils"
 	"github.com/gin-gonic/gin"
@@ -26,7 +26,7 @@ func Register(c *gin.Context) {
 	username := body.Username
 	passwd := body.Passwd
 	hashedPasswd, err := utils.Argon2Generate(passwd)
-	if _, err = db.PgClient.User.Create().SetUsername(username).SetPasswd(hashedPasswd).Save(context.Background()); err != nil {
+	if _, err = db.PgClient.User.Create().SetUsername(username).SetPasswd(hashedPasswd).Save(c); err != nil {
 		c.JSON(http.StatusBadRequest, models.MsgOnly(1, "register failed!"))
 		return
 	}
@@ -34,6 +34,7 @@ func Register(c *gin.Context) {
 	token, err := utils.JWTGenerate(claims)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.MsgOnly(1, "fail to gen token!"))
+		logger.Logger.Warnw(err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, models.NewResp(0, "ok", models.Token{Token: token}))
