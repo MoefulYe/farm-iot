@@ -1,6 +1,9 @@
 package handler
 
 import (
+	"net/http"
+	"pg/ent/device"
+
 	"github.com/MoefulYe/farm-iot/http-server/db"
 	"github.com/MoefulYe/farm-iot/http-server/grpc_service"
 	"github.com/MoefulYe/farm-iot/http-server/logger"
@@ -8,8 +11,6 @@ import (
 	"github.com/MoefulYe/farm-iot/http-server/protoc-gen/grpc/service"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"net/http"
-	"pg/ent/device"
 )
 
 // GetCowInfoByUuid
@@ -31,21 +32,24 @@ func GetCowInfoByUuid(c *gin.Context) {
 		return
 	}
 	resp := new(models.CowInfo)
-	err = db.PgClient.Device.
+	d, err := db.PgClient.Device.
 		Query().
 		Where(device.IDEQ(id)).
-		Select(
-			device.FieldID,
-			device.FieldBornAt,
-			device.FieldDeadAt,
-			device.FieldReason,
-			device.FieldParent,
-		).
-		Scan(c, resp)
+		First(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.MsgOnly(1, "no such cow"))
 		logger.Logger.Warnw(err.Error())
 		return
+	}
+	resp.Id = d.ID.String()
+	resp.DeadAt = d.DeadAt
+	resp.BornAt = d.BornAt
+	resp.Reason = d.Reason
+	isNull := d.Parent == uuid.UUID{}
+	if isNull {
+		resp.Parent = ""
+	} else {
+		resp.Parent = d.Parent.String()
 	}
 	c.JSON(http.StatusOK, models.NewResp(0, "ok", resp))
 }
