@@ -6,4 +6,5 @@ grpcAddr = "127.0.0.1:7891"
 
 [influxdb]
 url = "http://124.221.89.92:8086"
-auth = "EFr0bgEQip96t-RL99r6rURvBzj0MFi4LtC-vCpIKaQYu4CjKm5M59xXakfL2NtLMArwPlXUykhrinwJVD53Zg=="
+auth = "DLGOlxx9qW4858WBxyIqLAXJ_FPOzersD20zk8eZOZuX__anUkk25tZbLvXIxTyZKjD_R8t1Yu4CEPIvz7hXOw=="
+
