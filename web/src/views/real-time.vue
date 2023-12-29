@@ -99,3 +99,4 @@ const onChartClick = (params: ECElementEvent) => {
 <template>
   <v-chart :option="opt" :loading="loading" :loading-options="loadingOpts" @click="onChartClick" />
 </template>
+../api/heartbeat

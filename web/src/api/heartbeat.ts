@@ -2,7 +2,7 @@ import { request } from '@/util/requests'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 
-export interface KeepAlive {
+export interface Heartbeat {
   id: string
   time: Dayjs
   health?: number
@@ -31,7 +31,7 @@ export interface QueryParams {
   fields: Field[]
 }
 
-export const GetKeepAlive = async ({ fields, ...other }: QueryParams): Promise<KeepAlive[]> => {
+export const GetKeepAlive = async ({ fields, ...other }: QueryParams): Promise<Heartbeat[]> => {
   const arr: any[] | null = await request<any, any>({
     method: 'get',
     url: '/cow/keep-alive',
@@ -57,7 +57,7 @@ export const GetKeepAlive = async ({ fields, ...other }: QueryParams): Promise<K
 export const GetKeepAliveByUuid = async (
   uuid: string,
   { fields, ...other }: QueryParams
-): Promise<KeepAlive[]> => {
+): Promise<Heartbeat[]> => {
   const arr: any[] | null = await request({
     method: 'get',
     url: `/cow/keep-alive/${uuid}`,

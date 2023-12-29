@@ -13,7 +13,7 @@ import VChart from 'vue-echarts'
 import 'echarts/extension/bmap/bmap'
 import { useRoute } from 'vue-router'
 import dayjs from 'dayjs'
-import { Field, GetKeepAliveByUuid } from '../api/keep_alive'
+import { Field, GetKeepAliveByUuid } from '../api/heartbeat'
 import { NPopover, type SelectOption, NDatePicker, NSelect } from 'naive-ui/lib'
 import BmapTheme from '../assets/bmap.theme.json'
 

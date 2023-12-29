@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"pg/ent/device"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/MoefulYe/farm-iot/http-server/db"
 	"github.com/MoefulYe/farm-iot/http-server/grpc_service"
 	"github.com/MoefulYe/farm-iot/http-server/logger"
@@ -66,29 +67,35 @@ func GetCowInfoByUuid(c *gin.Context) {
 // @Failure 400 {object} models.Msg "failure"
 // @Router /cow [get]
 func GetCowInfo(c *gin.Context) {
-	var query models.PaginationQuery
-	if err := c.BindQuery(&query); err != nil {
-		c.JSON(http.StatusBadRequest, models.MsgOnly(1, "bad request"))
+	var params models.CowQuery
+	if err := c.BindQuery(&params); err != nil {
+		c.JSON(http.StatusBadRequest, models.MsgOnly(1, err.Error()))
 		return
 	}
-	offset := (query.Page - 1) * query.Size
-	limit := query.Size
-
-	cnt, err := db.PgClient.Device.Query().Count(c)
+	offset := (params.Page - 1) * params.Size
+	limit := params.Size
+	query := db.PgClient.Device.Query()
+	if params.Filter == "" || params.Filter == "alive" {
+		query.Where(device.DeadAtIsNil()).Order(device.ByBornAt(sql.OrderDesc()))
+	} else if params.Filter == "dead" {
+		query.Where(device.DeadAtNotNil()).Order(device.ByDeadAt(sql.OrderDesc()))
+	} else {
+		query.Order(device.ByBornAt(sql.OrderDesc()))
+	}
+	cnt, err := query.Clone().Count(c)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.MsgOnly(1, "db error"))
+		c.JSON(http.StatusBadRequest, models.MsgOnly(1, err.Error()))
 		logger.Logger.Warnw(err.Error())
 		return
 	}
 
 	var v []models.CowInfo
-	if err = db.PgClient.Device.
-		Query().
+	if err = query.
 		Limit(limit).Offset(offset).Select(
 		device.FieldID, device.FieldBornAt, device.FieldDeadAt,
 		device.FieldReason, device.FieldParent,
 	).Scan(c, &v); err != nil {
-		c.JSON(http.StatusBadRequest, models.MsgOnly(1, "db error"))
+		c.JSON(http.StatusBadRequest, models.MsgOnly(1, err.Error()))
 		logger.Logger.Warnw(err.Error())
 		return
 	}
