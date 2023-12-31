@@ -5,9 +5,9 @@ import (
 	"github.com/MoefulYe/farm-iot/iot-server/db"
 	"github.com/MoefulYe/farm-iot/iot-server/logger"
 	"github.com/MoefulYe/farm-iot/iot-server/protoc-gen/farm/cow/command"
+	"github.com/MoefulYe/farm-iot/iot-server/stream"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/google/uuid"
-	"github.com/influxdata/influxdb-client-go/v2/api/write"
 	"google.golang.org/protobuf/proto"
 	"time"
 )
@@ -31,13 +31,6 @@ func DieHandler(_ mqtt.Client, msg mqtt.Message) {
 
 	if die.Reason == "kill" {
 		money := die.Weight * 30.0
-		point := write.NewPoint(
-			"income", map[string]string{
-				"type": "kill",
-			}, map[string]interface{}{
-				"in": money,
-			}, time.Now(),
-		)
-		db.InfluxWriteApi.WritePoint(point)
+		stream.IncomeStream() <- money
 	}
 }

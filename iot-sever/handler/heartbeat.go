@@ -43,7 +43,7 @@ func HeartBeatHandler(server mqtt.Client, msg mqtt.Message) {
 	}
 	point := asPoint(heartBeat, claims.Id, ts)
 	db.InfluxWriteApi.WritePoint(point)
-	stream.Input() <- heartBeat
+	stream.HeartbeatStream() <- heartBeat
 	if !constant.InBound(heartBeat.Longitude, heartBeat.Latitude) {
 		topic := fmt.Sprintf("cow/%s/command/banish", claims.Id)
 		server.Publish(topic, 0, false, []byte{})

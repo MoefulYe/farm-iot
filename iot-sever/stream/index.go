@@ -12,24 +12,32 @@ import (
 )
 
 var (
-	source = make(chan any, 1024)
-	sink   = make(chan any, 1024)
+	heartbeatSrc  = make(chan any, 1024)
+	heartbeatSink = make(chan any, 1024)
+	incomeSrc     = make(chan any, 1024)
+	incomeSink    = make(chan any, 1024)
 )
 
 func init() {
-	go handle()
+	go handleHeartbeatStream()
 	go func() {
-		ext.NewChanSource(source).Via(flow.NewTumblingWindow(time.Minute * 5)).To(ext.NewChanSink(sink))
+		ext.NewChanSource(heartbeatSrc).Via(flow.NewTumblingWindow(time.Minute * 5)).To(ext.NewChanSink(heartbeatSink))
+	}()
+	go handleIncomeStream()
+	go func() {
+		ext.NewChanSource(incomeSrc).Via(flow.NewTumblingWindow(time.Minute * 5)).To(ext.NewChanSink(incomeSink))
 	}()
 	logger.Logger.Infow("init data stream")
 }
 
-func Input() chan<- any {
-	return source
+func HeartbeatStream() chan<- any {
+	return heartbeatSrc
 }
 
-func handle() {
-	for window := range sink {
+func IncomeStream() chan<- any { return incomeSrc }
+
+func handleHeartbeatStream() {
+	for window := range heartbeatSink {
 		window := window.([]any)
 		cnt := len(window)
 		sum := 0.0
@@ -68,5 +76,22 @@ func handle() {
 				}
 			}
 		}
+	}
+}
+
+func handleIncomeStream() {
+	for window := range incomeSink {
+		window := window.([]any)
+		sum := 0.0
+		for _, income := range window {
+			sum += income.(float64)
+		}
+		point := write.NewPoint(
+			"income",
+			map[string]string{"type": "kill"},
+			map[string]interface{}{"in": sum},
+			time.Now(),
+		)
+		db.InfluxWriteApi.WritePoint(point)
 	}
 }
