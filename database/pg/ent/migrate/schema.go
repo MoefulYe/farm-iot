@@ -20,6 +20,13 @@ var (
 		Name:       "balances",
 		Columns:    BalancesColumns,
 		PrimaryKey: []*schema.Column{BalancesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "balance_when",
+				Unique:  false,
+				Columns: []*schema.Column{BalancesColumns[1]},
+			},
+		},
 	}
 	// DevicesColumns holds the columns for the "devices" table.
 	DevicesColumns = []*schema.Column{
@@ -41,6 +48,18 @@ var (
 				Columns:    []*schema.Column{DevicesColumns[5]},
 				RefColumns: []*schema.Column{DevicesColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "device_born_at",
+				Unique:  false,
+				Columns: []*schema.Column{DevicesColumns[1]},
+			},
+			{
+				Name:    "device_dead_at",
+				Unique:  false,
+				Columns: []*schema.Column{DevicesColumns[3]},
 			},
 		},
 	}

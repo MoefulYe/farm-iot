@@ -3,6 +3,7 @@ package schema
 import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"time"
 )
 
@@ -23,4 +24,10 @@ func (Balance) Fields() []ent.Field {
 // Edges of the Balance.
 func (Balance) Edges() []ent.Edge {
 	return nil
+}
+
+func (Balance) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("when"),
+	}
 }
