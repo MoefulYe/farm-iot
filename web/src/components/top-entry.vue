@@ -3,8 +3,8 @@
     <NLayoutSider
       id="menu"
       collapse-mode="width"
-      :collapsed-width="64"
-      :width="240"
+      :collapsed-width="56"
+      :width="180"
       :collapsed="isCollapsed"
       @collapse="() => (isCollapsed = true)"
       @expand="() => (isCollapsed = false)"
@@ -16,7 +16,7 @@
         class="grow flex flex-col"
         content-style="display: flex; flex-direction: column; flex-grow: 1;"
       >
-        <MainContent />
+        <!-- <RouterView /> -->
       </NLayoutContent>
     </NLayout>
   </NLayout>
@@ -26,8 +26,7 @@
 import { ref } from 'vue'
 import { NLayout, NLayoutContent, NLayoutSider, useMessage, useLoadingBar } from 'naive-ui/lib'
 import { onMounted } from 'vue'
-import SideMenu from './side-menu'
-import MainContent from './main-content.vue'
+import SideMenu from './side-menu.vue'
 import { useRouter } from 'vue-router'
 
 const isCollapsed = ref(true)

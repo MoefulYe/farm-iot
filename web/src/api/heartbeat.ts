@@ -31,7 +31,7 @@ export interface QueryParams {
   fields: Field[]
 }
 
-export const getKeepAlive = async ({ fields, ...other }: QueryParams): Promise<Heartbeat[]> => {
+export const fetchHeartbeat = async ({ fields, ...other }: QueryParams): Promise<Heartbeat[]> => {
   const arr: any[] | null = await request<any, any>({
     method: 'get',
     url: '/cow/heartbeat',
@@ -54,7 +54,7 @@ export const getKeepAlive = async ({ fields, ...other }: QueryParams): Promise<H
   }
 }
 
-export const getKeepAliveByUuid = async (
+export const fetchHeartbeatByUuid = async (
   uuid: string,
   { fields, ...other }: QueryParams
 ): Promise<Heartbeat[]> => {

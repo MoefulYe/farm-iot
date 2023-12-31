@@ -1,24 +1,24 @@
 import loginModal from '@/components/login-modal'
 import { useTokenStore } from '@/stores/token'
-import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router'
 
 const routes: RouteRecordRaw[] = [
   {
     name: 'home',
     path: '/',
     redirect: {
-      name: 'real-time'
+      name: 'dashboard'
     }
   },
   {
-    name: 'real-time',
-    path: '/real-time',
-    component: () => import('../views/real-time.vue')
+    name: 'dashboard',
+    path: '/dashboard',
+    component: () => import('../views/dashboard-view.vue')
   },
   {
-    name: 'cow-info',
-    path: '/cow-info',
-    component: () => import('../views/cow-info.vue')
+    name: 'cow-manage',
+    path: '/cow',
+    component: () => import('../views/cow-view.vue')
   },
   {
     name: 'stat',
@@ -33,7 +33,7 @@ const routes: RouteRecordRaw[] = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes
 })
 

@@ -1,6 +1,6 @@
 {
   "common": {
-    "bodyColor": "#FBFBFCFF",
+    "bodyColor": "rgb(248, 249, 251)",
     "borderRadiusSmall": "4px",
     "baseColor": "#F8F9FBFF",
     "primaryColor": "#434c5eFF",

@@ -13,7 +13,7 @@ import {
 import { defineComponent, ref, render } from 'vue'
 import theme from '../assets/nord.naiveui.json'
 
-const login = defineComponent({
+const LoginPopup = defineComponent({
   setup(props, { emit }) {
     const model = ref<LoginReq>({ username: '', passwd: '' })
     const formRef = ref<FormInst | null>(null)
@@ -72,7 +72,7 @@ const login = defineComponent({
   }
 })
 
-const register = defineComponent({
+const RegisterPopup = defineComponent({
   setup(props, { emit }) {
     const model = ref<RegisterReq>({ username: '', passwd: '' })
     const formRef = ref<FormInst | null>(null)
@@ -140,7 +140,7 @@ const Modal = defineComponent({
         <NModal show={show.value}>
           <NCard class="w-96 rounded-md">
             {status.value === 'login' ? (
-              <login
+              <loginPopup
                 onRegister={() => (status.value = 'register')}
                 onClose={() => {
                   window.$router.go(-1)
@@ -148,7 +148,7 @@ const Modal = defineComponent({
                 }}
               />
             ) : (
-              <register
+              <registerPopup
                 onLogin={() => (status.value = 'login')}
                 onClose={() => {
                   window.$router.go(-1)

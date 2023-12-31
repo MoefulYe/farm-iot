@@ -13,7 +13,7 @@ import VChart from 'vue-echarts'
 import 'echarts/extension/bmap/bmap'
 import { useRoute } from 'vue-router'
 import dayjs from 'dayjs'
-import { Field, getKeepAliveByUuid } from '../api/heartbeat'
+import { Field, fetchHeartbeatByUuid } from '../api/heartbeat'
 import { NPopover, type SelectOption, NDatePicker, NSelect } from 'naive-ui/lib'
 import BmapTheme from '../assets/bmap.theme.json'
 
@@ -182,7 +182,7 @@ export default defineComponent({
     }
     const fetch = async () => {
       loading.value = true
-      getKeepAliveByUuid(uuid, {
+      fetchHeartbeatByUuid(uuid, {
         fields: [Field.longitude, Field.latitude],
         ...rangeStr()
       }).then((ok) => {
