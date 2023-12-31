@@ -32,8 +32,10 @@ func DieHandler(_ mqtt.Client, msg mqtt.Message) {
 	if die.Reason == "kill" {
 		money := die.Weight * 30.0
 		point := write.NewPoint(
-			"balance", map[string]string{}, map[string]interface{}{
-				"balance": money,
+			"income", map[string]string{
+				"type": "kill",
+			}, map[string]interface{}{
+				"in": money,
 			}, ts,
 		)
 		db.InfluxWriteApi.WritePoint(point)

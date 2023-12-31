@@ -34,10 +34,12 @@ func handle() {
 		cnt := len(window)
 		sum := 0.0
 		if cnt > 0 {
-			feedOutcome := -5.0 * cnt
+			feedOutcome := 5.0 * cnt
 			feed := write.NewPoint(
-				"balance", map[string]string{}, map[string]interface{}{
-					"balance": feedOutcome,
+				"outcome", map[string]string{
+					"type": "feed",
+				}, map[string]interface{}{
+					"out": feedOutcome,
 				}, time.Now(),
 			)
 			db.InfluxWriteApi.WritePoint(feed)
@@ -46,10 +48,13 @@ func handle() {
 			}
 			health := sum / float64(cnt)
 			if health < 0.5 {
-				cureOutcome := -50.0 * cnt
+				logger.Logger.Infow("cure")
+				cureOutcome := 50.0 * cnt
 				cure := write.NewPoint(
-					"balance", map[string]string{}, map[string]interface{}{
-						"balance": cureOutcome,
+					"outcome", map[string]string{
+						"type": "cure",
+					}, map[string]interface{}{
+						"out": cureOutcome,
 					}, time.Now(),
 				)
 				db.InfluxWriteApi.WritePoint(cure)
