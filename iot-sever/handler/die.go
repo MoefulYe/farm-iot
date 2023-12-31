@@ -36,7 +36,7 @@ func DieHandler(_ mqtt.Client, msg mqtt.Message) {
 				"type": "kill",
 			}, map[string]interface{}{
 				"in": money,
-			}, ts,
+			}, time.Now(),
 		)
 		db.InfluxWriteApi.WritePoint(point)
 	}
