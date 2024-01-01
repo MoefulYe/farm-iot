@@ -42,7 +42,7 @@ func handleHeartbeatStream() {
 		cnt := len(window)
 		sum := 0.0
 		if cnt > 0 {
-			feedOutcome := 5.0 * cnt
+			feedOutcome := 50.0 * cnt
 			feed := write.NewPoint(
 				"outcome", map[string]string{
 					"type": "feed",
