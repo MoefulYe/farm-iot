@@ -32,27 +32,17 @@ func GetCowInfoByUuid(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.MsgOnly(1, "illegal uuid!"))
 		return
 	}
-	resp := new(models.CowInfo)
 	d, err := db.PgClient.Device.
 		Query().
 		Where(device.IDEQ(id)).
+		WithChildren().
 		First(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.MsgOnly(1, "no such cow"))
 		logger.Logger.Warnw(err.Error())
 		return
 	}
-	resp.Id = d.ID.String()
-	resp.DeadAt = d.DeadAt
-	resp.BornAt = d.BornAt
-	resp.Reason = d.Reason
-	isNull := d.Parent == uuid.UUID{}
-	if isNull {
-		resp.Parent = ""
-	} else {
-		resp.Parent = d.Parent.String()
-	}
-	c.JSON(http.StatusOK, models.NewResp(0, "ok", resp))
+	c.JSON(http.StatusOK, models.NewResp(0, "ok", d))
 }
 
 // GetCowInfo

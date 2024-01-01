@@ -18,7 +18,7 @@ func (Device) Fields() []ent.Field {
 	return []ent.Field{
 		field.Time("born_at").Immutable(),
 		field.UUID("id", uuid.UUID{}).Immutable().Unique(),
-		field.String("hashed_passwd"),
+		field.String("hashed_passwd").Sensitive(),
 		field.Time("dead_at").Optional().Nillable(),
 		field.String("reason").Optional(),
 		field.UUID("parent", uuid.UUID{}).Optional(),

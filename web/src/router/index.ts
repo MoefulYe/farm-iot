@@ -21,8 +21,8 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../views/cow-view.vue')
   },
   {
-    name: 'stat',
-    path: '/stat/:uuid',
+    name: 'cow-stat',
+    path: '/cow/:uuid',
     component: () => import('../views/stat-view.vue')
   },
   {

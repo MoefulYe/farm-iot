@@ -12,17 +12,17 @@ export interface Heartbeat {
 }
 
 export enum Field {
-  health = 'health',
-  weight = 'weight',
-  longitude = 'longitude',
-  latitude = 'latitude'
+  Lealth = 'health',
+  Weight = 'weight',
+  Longitude = 'longitude',
+  Latitude = 'latitude'
 }
 
 export const FieldName = {
-  [Field.health]: '健康',
-  [Field.weight]: '体重',
-  [Field.latitude]: '纬度',
-  [Field.longitude]: '经度'
+  [Field.Lealth]: '健康',
+  [Field.Weight]: '体重',
+  [Field.Latitude]: '纬度',
+  [Field.Longitude]: '经度'
 }
 
 export interface QueryParams {

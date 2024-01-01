@@ -183,7 +183,7 @@ export default defineComponent({
     const fetch = async () => {
       loading.value = true
       fetchHeartbeatByUuid(uuid, {
-        fields: [Field.longitude, Field.latitude],
+        fields: [Field.Longitude, Field.Latitude],
         ...rangeStr()
       }).then((ok) => {
         data.value = ok.map((item) => [item.longitude!, item.latitude!])

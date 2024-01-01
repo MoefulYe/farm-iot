@@ -21,7 +21,7 @@ type Device struct {
 	// BornAt holds the value of the "born_at" field.
 	BornAt time.Time `json:"born_at,omitempty"`
 	// HashedPasswd holds the value of the "hashed_passwd" field.
-	HashedPasswd string `json:"hashed_passwd,omitempty"`
+	HashedPasswd string `json:"-"`
 	// DeadAt holds the value of the "dead_at" field.
 	DeadAt *time.Time `json:"dead_at,omitempty"`
 	// Reason holds the value of the "reason" field.
@@ -179,8 +179,7 @@ func (d *Device) String() string {
 	builder.WriteString("born_at=")
 	builder.WriteString(d.BornAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("hashed_passwd=")
-	builder.WriteString(d.HashedPasswd)
+	builder.WriteString("hashed_passwd=<sensitive>")
 	builder.WriteString(", ")
 	if v := d.DeadAt; v != nil {
 		builder.WriteString("dead_at=")

@@ -124,10 +124,10 @@ const rangeOptions = (custom: Ref<Range<number>>): SelectOption[] => [
 ]
 
 const fieldOpts: SelectOption[] = [
-  { label: '经度', value: Field.longitude },
-  { label: '维度', value: Field.latitude },
-  { label: '健康', value: Field.health },
-  { label: '体重', value: Field.weight }
+  { label: '经度', value: Field.Longitude },
+  { label: '维度', value: Field.Latitude },
+  { label: '健康', value: Field.Lealth },
+  { label: '体重', value: Field.Weight }
 ]
 
 export default defineComponent({
@@ -163,7 +163,7 @@ export default defineComponent({
         }
       }
     }
-    const fieldSelected = ref<Field[]>([Field.health])
+    const fieldSelected = ref<Field[]>([Field.Lealth])
     const loading = ref(false)
     const data = ref<Heartbeat[]>([])
     const fetch = () => {
