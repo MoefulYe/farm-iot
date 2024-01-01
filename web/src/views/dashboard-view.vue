@@ -1,19 +1,36 @@
 <script setup lang="ts">
-// import { computed, onMounted, ref } from 'vue'
-// import { ComposeOption, use } from 'echarts/core'
-// import { CanvasRenderer } from 'echarts/renderers'
-// import { TooltipComponent, TooltipComponentOption } from 'echarts/components'
-// import { ScatterSeriesOption, ScatterChart, CustomChart, CustomSeriesOption } from 'echarts/charts'
-// import VChart from 'vue-echarts'
-// import 'echarts/extension/bmap/bmap'
-// import { CENTER, COW_SVG_PATH, POLYGON } from '../contansts'
-// import { Field, fetchHeartbeat } from '../api/heartbeat'
-// import { ECElementEvent } from 'echarts/types/dist/shared'
-// import BmapTheme from '../assets/bmap.theme.json'
+import { NCard, NDivider, NStatistic } from 'naive-ui/lib'
+import { computed, onMounted, ref } from 'vue'
+import { CowQueryFilter, fetchCowInfo } from '../api/cow'
+import { type Balance, fetchBalance } from '../api/balance'
+import dayjs from 'dayjs'
 
-// type Opt = ComposeOption<ScatterSeriesOption | CustomSeriesOption | TooltipComponentOption>
-// use([CanvasRenderer, ScatterChart, CustomChart, TooltipComponent])
-// type Record = { name: string; value: [number, number] }
+import { ComposeOption, use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import {
+  TooltipComponent,
+  TooltipComponentOption,
+  GridComponent,
+  GridComponentOption
+} from 'echarts/components'
+import {
+  ScatterSeriesOption,
+  ScatterChart,
+  CustomChart,
+  CustomSeriesOption,
+  LineChart,
+  LineSeriesOption
+} from 'echarts/charts'
+import VChart from 'vue-echarts'
+import 'echarts/extension/bmap/bmap'
+import { CENTER, COW_SVG_PATH, POLYGON } from '../contansts'
+import { Field, fetchHeartbeat } from '../api/heartbeat'
+import { ECElementEvent } from 'echarts/types/dist/shared'
+import BmapTheme from '../assets/bmap.theme.json'
+
+type MapOpts = ComposeOption<ScatterSeriesOption | CustomSeriesOption | TooltipComponentOption>
+type LineOpts = ComposeOption<LineSeriesOption | TooltipComponentOption | GridComponentOption>
+use([CanvasRenderer, ScatterChart, CustomChart, TooltipComponent, LineChart, GridComponent])
 
 // const fetch = async (): Promise<void> => {
 //   loading.value = true
@@ -94,6 +111,101 @@
 // const onChartClick = (params: ECElementEvent) => {
 //   window.$router.push({ name: 'stat', params: { uuid: params.name } })
 // }
+
+const cowCnt = ref(0)
+const balances = ref<Balance[]>([])
+const income = computed(() => balances.value.reduce((acc, cur) => acc + cur.in - cur.out, 0))
+
+const lineOpts = computed<LineOpts>(() => ({
+  xAxis: {
+    type: 'time',
+    axisLabel: {
+      show: false
+    }
+  },
+  yAxis: {
+    type: 'value'
+  },
+  tooltip: {
+    trigger: 'axis'
+  },
+  series: [
+    {
+      type: 'line',
+      name: '收入',
+      data: balances.value.map((balance) => [balance.when, balance.in]),
+      smooth: true,
+      showSymbol: false,
+      areaStyle: {
+        opacity: 0.1
+      }
+    },
+    {
+      type: 'line',
+      name: '支出',
+      data: balances.value.map((balance) => [balance.when, balance.out]),
+      smooth: true,
+      showSymbol: false,
+      areaStyle: {
+        opacity: 0.1
+      }
+    }
+  ]
+}))
+
+onMounted(() => {
+  fetchCowInfo({
+    filter: CowQueryFilter.Alive,
+    size: 0,
+    page: 1
+  }).then(({ cnt }) => (cowCnt.value = cnt))
+  fetchBalance({
+    from: threeDaysAgo().format()
+  }).then((value) => (balances.value = value))
+  fetchHeartbeat({
+    start: '-5m',
+    fields: [Field.longitude, Field.latitude]
+  })
+})
 </script>
 
-<template>ss</template>
+<script lang="ts">
+const formatNumber = (num: number): string =>
+  num.toFixed(2).replace(/\d+/, (n) => n.replace(/(\d)(?=(\d{3})+$)/g, ($1) => $1 + ','))
+
+const formatInteger = (num: number): string =>
+  num.toString().replace(/\d+/, (n) => n.replace(/(\d)(?=(\d{3})+$)/g, ($1) => $1 + ','))
+
+const threeDaysAgo = () =>
+  dayjs().set('hour', 0).set('minute', 0).set('second', 0).set('millisecond', 0).subtract(3, 'day')
+</script>
+
+<template>
+  <div class="p-2 grow flex">
+    <NCard class="shadow-sm m-2">
+      欢迎来到智能牧场管理系统
+      <NDivider />
+      <div class="flex justify-around">
+        <NStatistic label="存栏量" class="inline-block">
+          <template #default>
+            {{ formatInteger(cowCnt) }}
+          </template>
+          <template #suffix>
+            <span>头</span>
+          </template>
+        </NStatistic>
+        <NStatistic label="近三日收支" class="inline-block">
+          <template #default>
+            {{ formatNumber(income) }}
+          </template>
+          <template #suffix>
+            <span>元</span>
+          </template>
+        </NStatistic>
+      </div>
+      <NDivider />
+      <VChart class="h-96" :option="lineOpts" autoresize />
+    </NCard>
+    <NCard class="grow shadow-sm m-2"></NCard>
+  </div>
+</template>

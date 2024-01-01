@@ -37,7 +37,7 @@
 import { DataTableColumns, NDataTable, NDropdown, DropdownOption } from 'naive-ui/lib'
 import { CowInfo } from '../api/cow'
 import { nextTick, onMounted, ref } from 'vue'
-import { getCowInfo } from '../api/cow'
+import { fetchCowInfo } from '../api/cow'
 
 const cows = ref<CowInfo[]>([])
 const pagination = ref({
@@ -58,7 +58,7 @@ const pagination = ref({
 })
 
 const fetch = async () => {
-  const { data, cnt } = await getCowInfo({
+  const { data, cnt } = await fetchCowInfo({
     page: pagination.value.page,
     size: pagination.value.pageSize
   })

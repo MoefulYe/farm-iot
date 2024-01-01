@@ -16,7 +16,7 @@
         class="grow flex flex-col"
         content-style="display: flex; flex-direction: column; flex-grow: 1;"
       >
-        <!-- <RouterView /> -->
+        <RouterView />
       </NLayoutContent>
     </NLayout>
   </NLayout>

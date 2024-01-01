@@ -139,7 +139,7 @@ func ranges(start string, stop string) string {
 
 func buildFlux(ranges string, fieldFilter string) string {
 	return fmt.Sprintf(
-		`from(bucket:"farm-iot")
+		`from(bucket:"farm")
 |> range(%s)
 |> filter(fn: (r) => r._measurement == "cow") 
 |> filter(fn: (r) => %s) 
@@ -151,7 +151,7 @@ func buildFlux(ranges string, fieldFilter string) string {
 
 func buildFlux4SelectedUuid(ranges string, fieldFilter string, uuid string) string {
 	return fmt.Sprintf(
-		`from(bucket:"farm-iot")
+		`from(bucket:"farm")
 |> range(%s)
 |> filter(fn: (r) => r._measurement == "cow" and  r.uuid == "%s") 
 |> filter(fn: (r) => %s) 
