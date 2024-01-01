@@ -26,7 +26,7 @@
       <VChart class="h-96" :option="lineOpts" autoresize />
     </NCard>
     <NCard class="grow shadow-sm m-2">
-      <VChart :option="mapOpts" autoresize @mousedown="({ name }) => gotoStatview(name)" />
+      <VChart :option="mapOpts" autoresize @mousedown="({ name }) => gotoCowView(name)" />
     </NCard>
   </div>
 </template>
@@ -221,8 +221,8 @@ const formatInteger = (num: number): string =>
 const threeDaysAgo = () =>
   dayjs().set('hour', 0).set('minute', 0).set('second', 0).set('millisecond', 0).subtract(3, 'day')
 
-const gotoStatview = (uuid: string) => {
-  window.$router.push({ name: 'cow-stat', params: { uuid } })
+const gotoCowView = (uuid: string) => {
+  window.$router.push({ name: 'cow', params: { uuid } })
 }
 
 const weight2size = (weight: number) => {

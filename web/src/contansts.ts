@@ -16,3 +16,5 @@ export const POLYGON = [
 ]
 
 export const BMAP_KEY: string = import.meta.env.VITE_BMAP_SDK_KEY
+
+export const NULL = '00000000-0000-0000-0000-000000000000'

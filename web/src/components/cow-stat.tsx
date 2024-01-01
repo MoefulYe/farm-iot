@@ -1,6 +1,6 @@
 import { Field, FieldName, fetchHeartbeatByUuid, type Heartbeat } from '../api/heartbeat'
 import dayjs from 'dayjs'
-import { NDatePicker, NPopover, NSelect, type SelectOption } from 'naive-ui/lib'
+import { NDatePicker, NPopover, NSelect, type SelectOption } from 'naive-ui'
 import { computed, defineComponent, onMounted, ref, watch, type Ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { use } from 'echarts/core'
@@ -144,7 +144,7 @@ export default defineComponent({
       UniversalTransition,
       LegendComponent
     ])
-    const uuid = useRoute().params.uuid as string
+    const route = useRoute()
     const custom = ref<Range<number>>({
       start: dayjs().subtract(1, 'day').valueOf(),
       stop: dayjs().valueOf()
@@ -168,7 +168,7 @@ export default defineComponent({
     const data = ref<Heartbeat[]>([])
     const fetch = () => {
       loading.value = true
-      fetchHeartbeatByUuid(uuid, {
+      fetchHeartbeatByUuid(route.params.uuid as string, {
         fields: fieldSelected.value,
         ...rangeStr()
       }).then((ok) => {
@@ -192,9 +192,12 @@ export default defineComponent({
           type: 'value',
           boundaryGap: [0, '100%'],
           max: 'dataMax',
-          min: 'dataMin'
+          min: 'dataMin',
+          axisLabel: {
+            formatter: (val) => `${val.toFixed(3)}`
+          }
         },
-        dataZoom: [{ type: 'inside', start: 0, end: 100 }, {}],
+        dataZoom: { type: 'inside', start: 0, end: 100 },
         series: fieldSelected.value.map((field) => {
           return {
             name: FieldName[field],
@@ -208,7 +211,7 @@ export default defineComponent({
     })
 
     onMounted(() => fetch())
-    watch([rangeSelected, fieldSelected], () => fetch())
+    watch([rangeSelected, fieldSelected, route], () => fetch())
 
     return () => (
       <div>

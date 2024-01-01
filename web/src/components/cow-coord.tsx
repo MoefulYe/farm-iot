@@ -14,7 +14,7 @@ import 'echarts/extension/bmap/bmap'
 import { useRoute } from 'vue-router'
 import dayjs from 'dayjs'
 import { Field, fetchHeartbeatByUuid } from '../api/heartbeat'
-import { NPopover, type SelectOption, NDatePicker, NSelect } from 'naive-ui/lib'
+import { NPopover, type SelectOption, NDatePicker, NSelect } from 'naive-ui'
 import BmapTheme from '../assets/bmap.theme.json'
 
 type ChartOpts = ComposeOption<CustomSeriesOption | TooltipComponentOption | LinesSeriesOption>
@@ -108,7 +108,7 @@ export default defineComponent({
   name: 'CowCoord',
   setup() {
     use([CanvasRenderer, CustomChart, TooltipComponent, LinesChart])
-    const uuid = useRoute().params.uuid as string
+    const route = useRoute()
     const data = ref<[number, number][] | undefined>(undefined)
     const loading = ref(true)
     const chartOpts = computed<ChartOpts>(() => {
@@ -126,34 +126,18 @@ export default defineComponent({
         },
         series: [
           {
-            type: 'custom',
-            coordinateSystem: 'bmap',
-            renderItem: (_, api) => {
-              const points = POLYGON.map((p) => api.coord(p))
-              return {
-                type: 'polygon',
-                shape: { points },
-                style: { fill: '#81a1c1', opacity: 0.1 }
-              }
-            },
-            animation: false,
-            silent: true,
-            data: POLYGON,
-            z: -10
-          },
-          {
             type: 'lines',
             coordinateSystem: 'bmap',
             data:
               data.value != undefined
                 ? [
                     {
-                      name: `${uuid.substring(0, 5)}...轨迹`,
                       coords: data.value,
                       lineStyle: {
-                        color: '#2e3440',
-                        width: 4
-                      }
+                        color: '#a3be8c',
+                        width: 2
+                      },
+                      name: `${(route.params.uuid as string).substring(0, 6)}...的运动轨迹`
                     }
                   ]
                 : undefined
@@ -182,7 +166,7 @@ export default defineComponent({
     }
     const fetch = async () => {
       loading.value = true
-      fetchHeartbeatByUuid(uuid, {
+      fetchHeartbeatByUuid(route.params.uuid as string, {
         fields: [Field.Longitude, Field.Latitude],
         ...rangeStr()
       }).then((ok) => {
@@ -191,11 +175,11 @@ export default defineComponent({
       })
     }
     onMounted(() => fetch())
-    watch(rangeSelected, () => fetch())
+    watch([rangeSelected, route], () => fetch())
     return () => (
       <div class="h-full">
         <NSelect class="w-48 pb-4" v-model={[rangeSelected.value, 'value']} options={rangeOpts} />
-        <VChart class="h-full" option={chartOpts.value} loading={loading.value} />
+        <VChart class="h-96" option={chartOpts.value} loading={loading.value} />
       </div>
     )
   }

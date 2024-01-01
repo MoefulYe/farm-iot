@@ -253,8 +253,8 @@ export default class Cow {
   }
 
   private mutateLocation() {
-    const delta_lo = (Math.random() - 0.5) * 0.0005;
-    const delta_la = (Math.random() - 0.5) * 0.0005;
+    const delta_lo = (Math.random() - 0.5) * 0.02;
+    const delta_la = (Math.random() - 0.5) * 0.02;
     this.state.longitude += delta_lo;
     this.state.latitude += delta_la;
   }

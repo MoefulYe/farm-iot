@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NCard } from 'naive-ui/lib'
+import { NCard } from 'naive-ui'
 import { RouterView } from 'vue-router'
 </script>
 

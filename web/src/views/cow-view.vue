@@ -1,117 +1,89 @@
-<template>
-  <NDataTable
-    :remote="true"
-    :columns="columns"
-    :data="cows"
-    :pagination="pagination"
-    :row-props="
-      (_, idx) => {
-        return {
-          onContextmenu: (e: MouseEvent) => {
-            e.preventDefault()
-            showDropdown = false
-            x = e.clientX
-            y = e.clientY
-            selected = idx
-            nextTick(() => {
-              showDropdown = true
-            })
-          }
-        }
-      }
-    "
-  />
-  <NDropdown
-    placement="bottom-start"
-    trigger="manual"
-    :x="x"
-    :y="y"
-    :options="dropdownItems"
-    :show="showDropdown"
-    @clickoutside="() => (showDropdown = false)"
-    @select="onSelected"
-  />
-</template>
-
 <script setup lang="ts">
-import { DataTableColumns, NDataTable, NDropdown, DropdownOption } from 'naive-ui/lib'
-import { CowInfo } from '../api/cow'
-import { nextTick, onMounted, ref } from 'vue'
-import { fetchCowInfo } from '../api/cow'
+import { NCard, NButton, NTabs, NTabPane } from 'naive-ui/lib'
+import { useRoute } from 'vue-router'
+import CowStat from '../components/cow-stat'
+import CowCoord from '../components/cow-coord'
+import { ref, watch } from 'vue'
+import { CowInfoWithChildren, fetchCowInfoByUuid } from '../api/cow'
+import { onMounted } from 'vue'
+import { NULL } from '../contansts'
+import { KillCow } from '../api/cow'
 
-const cows = ref<CowInfo[]>([])
-const pagination = ref({
-  page: 1,
-  pageSize: 10,
-  pageSizes: [2, 5, 10, 20, 40],
-  itemCount: 0,
-  showSizePicker: true,
-  onUpdatePage(page: number) {
-    pagination.value.page = page
+const route = useRoute()
+const data = ref<CowInfoWithChildren>()
+const uuid = ref<string>(route.params.uuid as string)
+
+watch(
+  () => route.params.uuid,
+  () => {
     fetch()
-  },
-  onUpdatePageSize(pageSize: number) {
-    pagination.value.pageSize = pageSize
-    pagination.value.page = 1
-    fetch()
+    uuid.value = route.params.uuid as string
   }
-})
+)
 
-const fetch = async () => {
-  const { data, cnt } = await fetchCowInfo({
-    page: pagination.value.page,
-    size: pagination.value.pageSize
-  })
-  cows.value = data
-  pagination.value.itemCount = cnt
-}
-
-onMounted(async () => {
-  await fetch()
-})
-
-const x = ref(0)
-const y = ref(0)
-const showDropdown = ref(false)
-const selected = ref(0)
-
-const onSelected = (key: string) => {
-  if (key === 'stat') {
-    window.$router.push({
-      name: 'stat',
-      params: {
-        uuid: cows.value[selected.value].id
-      }
-    })
-  }
-}
+const fetch = () => fetchCowInfoByUuid(route.params.uuid as string).then((ok) => (data.value = ok))
+onMounted(fetch)
 </script>
 
-<script lang="ts">
-const columns: DataTableColumns<CowInfo> = [
-  { title: '名字', key: 'id' },
-  {
-    title: '出生时间',
-    key: 'born_at',
-    render(row) {
-      return row.born_at.toISOString()
-    }
-  },
-  {
-    title: '死亡时间',
-    key: 'dead_at',
-    render(row) {
-      return row.dead_at?.toISOString() ?? ''
-    }
-  },
-  {
-    title: '死因',
-    key: 'reason',
-    render(row) {
-      return row.reason ?? ''
-    }
-  }
-]
-
-const dropdownItems: DropdownOption[] = [{ label: '统计', key: 'stat' }]
-</script>
+<template>
+  <div class="p-2 grow flex flex-col" v-if="data !== undefined">
+    <NCard class="m-1 shadow-sm">
+      <template #header> 基本信息 </template>
+      <template #default>
+        <div>编号：{{ data.id }}</div>
+        <div>出生日期：{{ data.born_at }}</div>
+        <div v-if="data.parent !== NULL">
+          母亲：
+          <RouterLink
+            class="no-underline text-[#434c5e] hover:text-[#81a1c1]"
+            v-if="data.parent !== NULL"
+            :to="{
+              name: 'cow',
+              params: {
+                uuid: data.parent
+              }
+            }"
+            >{{ data.parent }}</RouterLink
+          >
+        </div>
+        <div v-if="data.edges.children !== undefined">
+          孩子：
+          <RouterLink
+            class="no-underline text-[#434c5e] hover:text-[#81a1c1]"
+            v-for="{ id } in data.edges.children"
+            :to="{
+              name: 'cow',
+              params: {
+                uuid: id
+              }
+            }"
+            >{{ id }}，</RouterLink
+          >
+        </div>
+        <div v-if="data.dead_at !== undefined">
+          <div>死亡日期：{{ data.dead_at }}</div>
+          <div>死亡原因：{{ data.reason }}</div>
+        </div>
+        <div v-else>
+          <div>指令下发：</div>
+          <NButton class="mt-2" @click="KillCow([data.id]).then(() => fetch())">
+            杀死该牲畜
+          </NButton>
+        </div>
+      </template>
+    </NCard>
+    <NCard class="m-1 grow shadow-sm">
+      <template #header>数据统计</template>
+      <template #default>
+        <NTabs>
+          <NTabPane name="统计">
+            <CowStat />
+          </NTabPane>
+          <NTabPane name="位置">
+            <CowCoord />
+          </NTabPane>
+        </NTabs>
+      </template>
+    </NCard>
+  </div>
+</template>

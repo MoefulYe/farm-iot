@@ -9,13 +9,14 @@
 </template>
 
 <script setup lang="tsx">
-import { type MenuOption, NIcon, NMenu } from 'naive-ui/lib'
+import { type MenuOption, NIcon, NMenu } from 'naive-ui'
 import { RouterLink } from 'vue-router'
 import { useTokenStore } from '../stores/token'
 import loginModal from './login-modal'
 import { ref } from 'vue'
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@vicons/antd'
 import { Dashboard, EdgeCluster, Exit, Settings } from '@vicons/carbon'
+import { JSX } from 'vue/jsx-runtime'
 
 const emit = defineEmits<{
   toggle: [value: boolean]

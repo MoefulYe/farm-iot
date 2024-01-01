@@ -9,7 +9,7 @@ import {
   NConfigProvider,
   NButton,
   NDivider
-} from 'naive-ui/lib'
+} from 'naive-ui'
 import { defineComponent, ref, render } from 'vue'
 import theme from '../assets/nord.naiveui.json'
 

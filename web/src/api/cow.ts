@@ -16,25 +16,30 @@ export interface CowQueryParams {
 
 export interface CowInfo {
   id: string
-  born_at: Dayjs
-  dead_at?: Dayjs
+  born_at: string
+  dead_at?: string
   reason?: string
-  parent?: string
+  parent: string
 }
 
-export const fetchCowInfoByUuid = async (uuid: string): Promise<CowInfo> => {
-  const { dead_at, born_at, ...other } = await request<any, any>({
+export interface CowInfoWithChildren {
+  id: string
+  born_at: string
+  dead_at?: string
+  reason?: string
+  parent: string
+  edges: {
+    children?: {
+      id: string
+    }[]
+  }
+}
+
+export const fetchCowInfoByUuid = (uuid: string): Promise<CowInfoWithChildren> =>
+  request<any, any>({
     method: 'get',
     url: `/cow/${uuid}/`
   })
-  const dead_at_dayjs = dead_at ? dayjs(dead_at) : undefined
-  const born_at_dayjs = dayjs(born_at)
-  return {
-    ...other,
-    born_at: born_at_dayjs,
-    dead_at: dead_at_dayjs
-  }
-}
 
 export const fetchCowInfo = async (query: CowQueryParams): Promise<Paginated<CowInfo>> => {
   let { cnt, data } = await request<any, any>({
@@ -43,19 +48,9 @@ export const fetchCowInfo = async (query: CowQueryParams): Promise<Paginated<Cow
     params: query
   })
   data = data === null ? [] : data
-  const d = (data as any[]).map((item) => {
-    const { dead_at, born_at, ...other } = item
-    const dead_at_dayjs = dead_at ? dayjs(dead_at) : undefined
-    const born_at_dayjs = dayjs(born_at)
-    return {
-      born_at: born_at_dayjs,
-      dead_at: dead_at_dayjs,
-      ...other
-    }
-  })
   return {
     cnt,
-    data: d
+    data
   }
 }
 
