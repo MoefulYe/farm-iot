@@ -8,7 +8,7 @@ import {
   LinesChart,
   type LinesSeriesOption
 } from 'echarts/charts'
-import { CENTER, POLYGON } from '../contansts'
+import { CENTER } from '../contansts'
 import VChart from 'vue-echarts'
 import 'echarts/extension/bmap/bmap'
 import { useRoute } from 'vue-router'

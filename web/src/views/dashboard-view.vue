@@ -225,6 +225,8 @@ const gotoCowView = (uuid: string) => {
   window.$router.push({ name: 'cow', params: { uuid } })
 }
 
+const gotoBalanceView = () => window.$router.push({ name: 'balance' })
+
 const weight2size = (weight: number) => {
   weight = Math.min(weight, 150)
   return weight / 15 + 5

@@ -15,7 +15,7 @@ import { useTokenStore } from '../stores/token'
 import loginModal from './login-modal'
 import { ref } from 'vue'
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@vicons/antd'
-import { Dashboard, EdgeCluster, Exit, Settings } from '@vicons/carbon'
+import { ChartLine, Dashboard, EdgeCluster, Exit, Settings } from '@vicons/carbon'
 import { JSX } from 'vue/jsx-runtime'
 
 const emit = defineEmits<{
@@ -55,6 +55,11 @@ const entries: MenuOption[] = [
     icon: renderIcon(<EdgeCluster />)
   },
   {
+    label: renderRouterLink('/balance', '收支管理'),
+    key: Entry.Balance,
+    icon: renderIcon(<ChartLine />)
+  },
+  {
     label: '设置',
     key: Entry.Settings,
     icon: renderIcon(<Settings />),
@@ -79,6 +84,7 @@ enum Entry {
   Dashboard,
   Settings,
   Cows,
-  Quit
+  Quit,
+  Balance
 }
 </script>

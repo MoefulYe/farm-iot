@@ -269,7 +269,7 @@ export default class Cow {
     let delta_lo = LONGITUDE_CENTER - longitude;
     let delta_la = LATITUDE_CENTER - latitude;
     const distance = Math.sqrt(delta_lo ** 2 + delta_la ** 2);
-    const unit = 0.002;
+    const unit = 0.1;
     delta_la *= unit / distance;
     delta_lo *= unit / distance;
     this.state.longitude += delta_lo;

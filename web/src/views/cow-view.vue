@@ -7,7 +7,7 @@ import { ref, watch } from 'vue'
 import { CowInfoWithChildren, fetchCowInfoByUuid } from '../api/cow'
 import { onMounted } from 'vue'
 import { NULL } from '../contansts'
-import { KillCow } from '../api/cow'
+import { KillCow as killCow } from '../api/cow'
 
 const route = useRoute()
 const data = ref<CowInfoWithChildren>()
@@ -22,6 +22,11 @@ watch(
 )
 
 const fetch = () => fetchCowInfoByUuid(route.params.uuid as string).then((ok) => (data.value = ok))
+const kill = () =>
+  killCow([data.value?.id!]).then(() => {
+    fetch()
+    window.$message.success('操作成功')
+  })
 onMounted(fetch)
 </script>
 
@@ -66,9 +71,7 @@ onMounted(fetch)
         </div>
         <div v-else>
           <div>指令下发：</div>
-          <NButton class="mt-2" @click="KillCow([data.id]).then(() => fetch())">
-            杀死该牲畜
-          </NButton>
+          <NButton class="mt-2" @click="kill"> 杀死该牲畜 </NButton>
         </div>
       </template>
     </NCard>
